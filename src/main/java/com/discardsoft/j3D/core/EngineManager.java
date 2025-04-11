@@ -1,9 +1,9 @@
 /***********************************************************|-
- -|      04/10/2025 | DISCVRD Software | Rhys Beynon        |-
+ -|              04/10/2025 | DISCVRD Software              |-
  -|        j3D is a lightweight custom build engine         |-
  -|        Made with LWJGL, openGL, JOML, and other         |-
  -|        helpful libraries for use on DiscardSoft         |-
- -|           Main class and entry point for j3D            |-
+ -|              Engine Manager class for j3D               |-
  -|    Comments are always written above relevant context.  |-
  -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
  -|               Version: 0.1 In Development               |-
@@ -36,11 +36,12 @@ public class EngineManager {
     private WindowManager window;
     //Error callback for Engine class
     private GLFWErrorCallback errorCallback;
+    //Use ILogic interface file as a game logic guideline
+    private ILogic gameLogic;
 
     /*
     HERE LIES THE METHODS.
     These are important methods that are the spine (or trunk in flora terms) of j3D.
-
     Comments are available for more information on each method below.
      */
 
@@ -146,20 +147,22 @@ public class EngineManager {
     }
 
     private void input() {
-        //todo
+        gameLogic.input();
     }
 
     //use window manager to update the current canvas
     private void render() {
+        gameLogic.render();
         window.update();
     }
 
     private void update() {
-        //todo
+        gameLogic.update();
     }
 
     //gracefully cleanup and exit program
     private void cleanup() {
+        gameLogic.cleanup();
         window.cleanup();
         errorCallback.free();
         GLFW.glfwTerminate();

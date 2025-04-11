@@ -3,19 +3,37 @@
  -|        j3D is a lightweight custom build engine         |-
  -|        Made with LWJGL, openGL, JOML, and other         |-
  -|        helpful libraries for use on DiscardSoft         |-
- -|           List of constant variables for j3D            |-
+ -|              Render Manager class for j3D               |-
  -|    Comments are always written above relevant context.  |-
  -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
  -|               Version: 0.1 In Development               |-
  -|**********************************************************/
 
-package com.discardsoft.j3D.core.utils;
+package com.discardsoft.j3D.core;
 
-public class Consts {
+import com.discardsoft.j3D.Main;
+import org.lwjgl.opengl.GL11;
 
-    public static final String VERSION = "0.1";
-    public static final String AUTHOR = "DiscardSoft";
-    public static final String AUTHOR_STYLIZED = "DISCVRD";
-    public static final String TITLE = "j3D";
+public class RenderManager {
+    private final WindowManager window;
 
+    public RenderManager() {
+        window = Main.getWindow();
+    }
+
+    public void init() throws Exception {
+
+    }
+
+    public void render() {
+
+    }
+
+    public void clear() {
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+    }
+
+    public void cleanup() {
+
+    }
 }
