@@ -51,8 +51,11 @@ public class EngineManager {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         //use getter from Main class to get window instance
         window = Main.getWindow();
-        //run init() method from Window Manager to create window using GLFW
+        //use getter for the game we would like to run.
+        gameLogic = Main.getGame();
+        //run init() methods for Game's Logic and Window Manager to create game window using GLFW
         window.init();
+        gameLogic.init();
     }
 
     //This runs Init() and makes tells everything else the engine is now running.
