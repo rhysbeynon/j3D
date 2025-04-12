@@ -1,10 +1,8 @@
 package com.discardsoft.j3D.game;
 
 import com.discardsoft.j3D.Main;
-import com.discardsoft.j3D.core.EngineManager;
-import com.discardsoft.j3D.core.ILogic;
-import com.discardsoft.j3D.core.RenderManager;
-import com.discardsoft.j3D.core.WindowManager;
+import com.discardsoft.j3D.core.*;
+import com.discardsoft.j3D.core.entity.Model;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -14,16 +12,37 @@ public class TestGame implements ILogic {
     private float color = 0.0f;
 
     private final RenderManager renderer;
+    private final ObjectLoader loader;
     private final WindowManager window;
+
+    private Model model;
 
     public TestGame() {
         renderer = new RenderManager();
         window = Main.getWindow();
+        loader = new ObjectLoader();
     }
 
     @Override
     public void init() throws Exception {
         renderer.init();
+
+        //DEBUG RECTANGLE
+        float[] vertices = {
+                -0.5f, 0.5f, 0f,
+                -0.5f, -0.5f, 0f,
+                0.5f, -0.5f, 0f,
+                0.5f, -0.5f, 0f,
+                0.5f, 0.5f, 0f,
+                -0.5f, 0.5f, 0f
+        };
+
+        int[] indices = {
+                0, 1, 3,
+                3, 1, 2
+        };
+
+        model = loader.loadModel(vertices, indices);
     }
 
     @Override
@@ -53,11 +72,12 @@ public class TestGame implements ILogic {
         }
 
         window.setClearColor(color, color, color, 1.0f);
-        renderer.clear();
+        renderer.render(model);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
+        loader.cleanup();
     }
 }
