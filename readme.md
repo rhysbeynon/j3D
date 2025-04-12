@@ -3,7 +3,7 @@
 
 ```/***********************************************************|-``` <br>
 ``` -|              04/10/2025 | DISCVRD Software              |-``` <br>
-``` -|        j3D is a lightweight custom build engine         |-``` <br>
+``` -|        j3D is a lightweight custom-built engine         |-``` <br>
 ``` -|        Made with LWJGL, openGL, JOML, and other         |-``` <br>
 ``` -|        helpful libraries, for use by DiscardSoft        |-``` <br>
 ``` -|               Central Repository for j3D                |-``` <br>

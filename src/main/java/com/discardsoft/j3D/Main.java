@@ -1,6 +1,6 @@
 /***********************************************************|-
  -|      04/10/2025 | DISCVRD Software | Rhys Beynon        |-
- -|        j3D is a lightweight custom build engine         |-
+ -|        j3D is a lightweight custom-built engine         |-
  -|        Made with LWJGL, openGL, JOML, and other         |-
  -|        helpful libraries for use on DiscardSoft         |-
  -|           Main class and entry point for j3D            |-
