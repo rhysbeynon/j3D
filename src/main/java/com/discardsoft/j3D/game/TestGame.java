@@ -3,6 +3,7 @@ package com.discardsoft.j3D.game;
 import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.*;
 import com.discardsoft.j3D.core.entity.Model;
+import com.discardsoft.j3D.core.entity.Texture;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -29,12 +30,10 @@ public class TestGame implements ILogic {
 
         //DEBUG RECTANGLE
         float[] vertices = {
-                -0.5f, 0.5f, 0f,
+                0.5f, -0.5f, 0f,
+                0.5f,  0.5f, 0f,
+                -0.5f,  0.5f, 0f,
                 -0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, 0.5f, 0f,
-                -0.5f, 0.5f, 0f
         };
 
         int[] indices = {
@@ -42,7 +41,13 @@ public class TestGame implements ILogic {
                 3, 1, 2
         };
 
-        model = loader.loadModel(vertices, indices);
+        float[] textureCoords = {
+                0.0f, 0.1f,
+                1.1f, 1.0f
+        };
+
+        model = loader.loadModel(vertices, textureCoords, indices);
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/test.png")));
     }
 
     @Override
