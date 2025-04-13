@@ -23,8 +23,8 @@ public class WindowManager {
 
     //CONSTANT VARS for window management
     public static final float FOV = (float) Math.toRadians(60);
-    public static final float Z_NEAR = 0.1f;
-    public static final float Z_FAR = 1000.0f;
+    public static final float Z_NEAR = 0.001f;
+    public static final float Z_FAR = 10000f;
 
     private final String title;
 
@@ -173,9 +173,8 @@ public class WindowManager {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_STENCIL_TEST);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
-
+//        GL11.glEnable(GL11.GL_CULL_FACE);
+//        GL11.glCullFace(GL11.GL_BACK);
     }
 
     /*

@@ -1,6 +1,7 @@
 package com.discardsoft.j3D.core;
 
 import com.discardsoft.j3D.Main;
+import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.utils.Transformation;
@@ -25,14 +26,19 @@ public class RenderManager {
         shader.link();
         shader.createUniform("textureSampler");
         shader.createUniform("transformationMatrix");
+        shader.createUniform("projectionMatrix");
+        shader.createUniform("viewMatrix");
 
     }
 
-    public void render(Entity entity) {
+    public void render(Entity entity, Camera camera) {
         clear();
         shader.bind();
         shader.setUniform("textureSampler", 0);
         shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity));
+        shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
+        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
+
         GL30.glBindVertexArray(entity.getModel().getId());
         //use our previously set index value of 0 (arbitrary)
         GL20.glEnableVertexAttribArray(0);
