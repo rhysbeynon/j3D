@@ -1,7 +1,9 @@
 package com.discardsoft.j3D.core;
 
 import com.discardsoft.j3D.Main;
+import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Model;
+import com.discardsoft.j3D.core.utils.Transformation;
 import com.discardsoft.j3D.core.utils.Utils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -22,19 +24,22 @@ public class RenderManager {
         shader.createFragmentShader(Utils.loadResource("/shaders/fragment.fs"));
         shader.link();
         shader.createUniform("textureSampler");
+        shader.createUniform("transformationMatrix");
+
     }
 
-    public void render(Model model) {
+    public void render(Entity entity) {
         clear();
-        GL30.glBindVertexArray(model.getId());
         shader.bind();
         shader.setUniform("textureSampler", 0);
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity));
+        GL30.glBindVertexArray(entity.getModel().getId());
         //use our previously set index value of 0 (arbitrary)
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL15.glActiveTexture(GL15.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getId());
-        GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, entity.getModel().getTexture().getId());
+        GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
         //unset all the values after using them
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);

@@ -2,8 +2,10 @@ package com.discardsoft.j3D.game;
 
 import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.*;
+import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.entity.Texture;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -16,7 +18,7 @@ public class TestGame implements ILogic {
     private final ObjectLoader loader;
     private final WindowManager window;
 
-    private Model model;
+    private Entity entity;
 
     public TestGame() {
         renderer = new RenderManager();
@@ -46,8 +48,9 @@ public class TestGame implements ILogic {
                 1.1f, 1.0f
         };
 
-        model = loader.loadModel(vertices, textureCoords, indices);
+        Model model = loader.loadModel(vertices, textureCoords, indices);
         model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/test.png")));
+        entity = new Entity(model, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
     }
 
     @Override
@@ -61,11 +64,17 @@ public class TestGame implements ILogic {
 
     @Override
     public void update() {
+        // Update color separately
         color += direction * 0.01f;
-        if(color < 0.0f){
-            color = 0.0f;
-        } else if(color > 1.0f){
-            color = 1.0f;
+        color = Math.max(0.0f, Math.min(color, 1.0f));
+
+        // Consistent leftward movement independent of color condition
+        entity.getPos().x += 0.1f;
+        //position wrapping for window border
+        if(entity.getPos().x < -1.6f) {
+            entity.getPos().x = 1.5f;
+        } else if (entity.getPos().x > 1.6f) {
+            entity.getPos().x = -1.5f;
         }
     }
 
@@ -77,7 +86,7 @@ public class TestGame implements ILogic {
         }
 
         window.setClearColor(color, color, color, 1.0f);
-        renderer.render(model);
+        renderer.render(entity);
     }
 
     @Override
