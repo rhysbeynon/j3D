@@ -35,62 +35,100 @@ public class TestGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        //DEBUG RECTANGLE
+        //DEBUG CUBE
         float[] vertices = new float[] {
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                -0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                -0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
+                // Front face (z+)
+                -0.5f, 0.5f, 0.5f,    // 0: top-left
+                -0.5f, -0.5f, 0.5f,   // 1: bottom-left
+                0.5f, -0.5f, 0.5f,    // 2: bottom-right
+                0.5f, 0.5f, 0.5f,     // 3: top-right
+
+                // Back face (z-)
+                -0.5f, 0.5f, -0.5f,   // 4: top-left
+                -0.5f, -0.5f, -0.5f,  // 5: bottom-left
+                0.5f, -0.5f, -0.5f,   // 6: bottom-right
+                0.5f, 0.5f, -0.5f,    // 7: top-right
+
+                // Top face (y+)
+                -0.5f, 0.5f, -0.5f,   // 8: back-left
+                0.5f, 0.5f, -0.5f,    // 9: back-right
+                -0.5f, 0.5f, 0.5f,    // 10: front-left
+                0.5f, 0.5f, 0.5f,     // 11: front-right
+
+                // Right face (x+)
+                0.5f, 0.5f, 0.5f,     // 12: top-front
+                0.5f, -0.5f, 0.5f,    // 13: bottom-front
+                0.5f, 0.5f, -0.5f,    // 14: top-back
+                0.5f, -0.5f, -0.5f,   // 15: bottom-back
+
+                // Left face (x-)
+                -0.5f, 0.5f, 0.5f,    // 16: top-front
+                -0.5f, -0.5f, 0.5f,   // 17: bottom-front
+                -0.5f, 0.5f, -0.5f,   // 18: top-back
+                -0.5f, -0.5f, -0.5f,  // 19: bottom-back
+
+                // Bottom face (y-)
+                -0.5f, -0.5f, -0.5f,  // 20: back-left
+                0.5f, -0.5f, -0.5f,   // 21: back-right
+                -0.5f, -0.5f, 0.5f,   // 22: front-left
+                0.5f, -0.5f, 0.5f     // 23: front-right
         };
+
         float[] textureCoords = new float[]{
-                0.0f, 0.0f,
-                0.0f, 0.5f,
-                0.5f, 0.5f,
-                0.5f, 0.0f,
-                0.0f, 0.0f,
-                0.5f, 0.0f,
-                0.0f, 0.5f,
-                0.5f, 0.5f,
-                0.0f, 0.5f,
-                0.5f, 0.5f,
-                0.0f, 1.0f,
-                0.5f, 1.0f,
-                0.0f, 0.0f,
-                0.0f, 0.5f,
-                0.5f, 0.0f,
-                0.5f, 0.5f,
-                0.5f, 0.0f,
-                1.0f, 0.0f,
-                0.5f, 0.5f,
-                1.0f, 0.5f,
+                // Front Face (z+)
+                0.0f, 0.0f, // top-left
+                0.0f, 1.0f, // bottom-left
+                1.0f, 1.0f, // bottom-right
+                1.0f, 0.0f, // top-right
+
+                // Back Face (z-)
+                1.0f, 0.0f, // top-left
+                1.0f, 1.0f, // bottom-left
+                0.0f, 1.0f, // bottom-right
+                0.0f, 0.0f, // top-right
+
+                // Top Face (y+)
+                0.0f, 0.0f, // back-left
+                1.0f, 0.0f, // back-right
+                0.0f, 1.0f, // front-left
+                1.0f, 1.0f, // front-right
+
+                // Right Face (x+)
+                0.0f, 0.0f, // top-front
+                0.0f, 1.0f, // bottom-front
+                1.0f, 0.0f, // top-back
+                1.0f, 1.0f, // bottom-back
+
+                // Left Face (x-)
+                1.0f, 0.0f, // top-front
+                1.0f, 1.0f, // bottom-front
+                0.0f, 0.0f, // top-back
+                0.0f, 1.0f, // bottom-back
+
+                // Bottom Face (y-)
+                0.0f, 0.0f, // back-left
+                1.0f, 0.0f, // back-right
+                0.0f, 1.0f, // front-left
+                1.0f, 1.0f  // front-right
         };
+
         int[] indices = new int[]{
+                // Front face
                 0, 1, 3, 3, 1, 2,
-                8, 10, 11, 9, 8, 11,
-                12, 13, 7, 5, 12, 7,
-                14, 15, 6, 4, 14, 6,
-                16, 18, 19, 17, 16, 19,
-                4, 6, 7, 5, 4, 7,
+                // Back face
+                4, 7, 5, 5, 7, 6,
+                // Top face
+                8, 9, 10, 10, 9, 11,
+                // Right face
+                12, 14, 13, 13, 14, 15,
+                // Left face
+                16, 18, 17, 17, 18, 19,
+                // Bottom face
+                20, 21, 22, 22, 21, 23
         };
 
         Model model = loader.loadModel(vertices, textureCoords, indices);
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/test.png")));
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/errtex.png")));
         entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
     }
 
