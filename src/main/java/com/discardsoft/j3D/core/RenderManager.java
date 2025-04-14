@@ -45,6 +45,9 @@ public class RenderManager {
         GL20.glEnableVertexAttribArray(1);
         GL15.glActiveTexture(GL15.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, entity.getModel().getTexture().getId());
+        //disables texture filtering
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
         //unset all the values after using them
         GL20.glDisableVertexAttribArray(0);

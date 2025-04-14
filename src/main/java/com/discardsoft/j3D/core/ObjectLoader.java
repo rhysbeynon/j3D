@@ -49,7 +49,13 @@ public class ObjectLoader {
 
             buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelBuffer, 4);
             if(buffer == null) {
-                throw new Exception("Failed to load " + path + " texture file: " + STBImage.stbi_failure_reason());
+                //loads missing texture file if selection not found
+                path = "src/main/resources/textures/errtex.png";
+                buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelBuffer, 4);
+                if(buffer == null) {
+                    //throws fit if missing texture file could be loaded (Should never happen)
+                    throw new Exception("Failed to load " + path + " texture file: " + STBImage.stbi_failure_reason());
+                }
             }
 
             width = widthBuffer.get();
