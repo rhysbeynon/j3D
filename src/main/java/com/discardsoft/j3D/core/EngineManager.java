@@ -102,12 +102,12 @@ public class EngineManager {
                 if (window.windowShouldClose()) {
                     stop();
                 }
-                //if the framecounter is older than 1 second (1 billion nanoseconds),
+                //if the frame counter is older than 1 second (1 billion nanoseconds),
                 if (frameCounter >= NANOSECOND) {
                     //refresh fps counter
                     setFps(frames);
                     //change title to show fps counter
-                    window.setTitle(Consts.TITLE + " | fps: " + fps);
+                    window.setTitle(Consts.TITLE + " | " + Consts.VERSION + " | fps: " + fps);
                     //reset both framerate variables for next update
                     frames = 0;
                     frameCounter = 0;
