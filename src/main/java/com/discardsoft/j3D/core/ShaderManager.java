@@ -100,10 +100,11 @@ public class ShaderManager {
         if(fragmentShaderID != 0) {
             GL20.glDetachShader(programID, fragmentShaderID);
         }
-        GL20.glValidateProgram(programID);
-        if(GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == 0) {
-            System.err.println("Warning validating shader code: " + GL20.glGetProgramInfoLog(programID, 512));
-        }
+        // Validation is not necessary here as we validate during rendering
+        // GL20.glValidateProgram(programID);
+        // if(GL20.glGetProgrami(programID, GL20.GL_VALIDATE_STATUS) == 0) {
+        //     System.err.println("Warning validating shader code: " + GL20.glGetProgramInfoLog(programID, 512));
+        // }
     }
 
 
