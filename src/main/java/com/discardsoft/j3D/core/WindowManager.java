@@ -277,7 +277,36 @@ public class WindowManager {
     }
 
     public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
-        float aspectRatio = (float) width / (float) height;
-        return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+        float aspectRatio = (float) width / height;
+        return matrix.perspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+    }
+
+    /**
+     * Get the current X position of the cursor
+     * @return The X position of the cursor
+     */
+    public double getCursorX() {
+        double[] xpos = new double[1];
+        GLFW.glfwGetCursorPos(window, xpos, null);
+        return xpos[0];
+    }
+    
+    /**
+     * Get the current Y position of the cursor
+     * @return The Y position of the cursor
+     */
+    public double getCursorY() {
+        double[] ypos = new double[1];
+        GLFW.glfwGetCursorPos(window, null, ypos);
+        return ypos[0];
+    }
+    
+    /**
+     * Set the position of the cursor
+     * @param x The X position to set
+     * @param y The Y position to set
+     */
+    public void setCursorPosition(int x, int y) {
+        GLFW.glfwSetCursorPos(window, x, y);
     }
 }

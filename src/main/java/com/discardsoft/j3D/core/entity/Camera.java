@@ -30,6 +30,18 @@ public class Camera {
         position.y += y;
     }
 
+    /**
+     * Move the camera position in world coordinates (independent of camera rotation)
+     * @param x X-axis movement
+     * @param y Y-axis movement
+     * @param z Z-axis movement
+     */
+    public void movePositionNormalized(float x, float y, float z) {
+        position.x += x;
+        position.y += y;
+        position.z += z;
+    }
+
     public void setPosition(float x, float y, float z) {
         this.position.x = x;
         this.position.y = y;
