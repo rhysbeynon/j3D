@@ -23,6 +23,8 @@ public class Main {
     private static TestGame game;
 
     public static void main(String[] args) {
+        System.out.println("Starting j3D...");
+        System.out.println("LWJGL Version: " + Version.getVersion());
         window = new WindowManager(Consts.TITLE, 800, 600, false);
         game = new TestGame();
         EngineManager engine = new EngineManager();
