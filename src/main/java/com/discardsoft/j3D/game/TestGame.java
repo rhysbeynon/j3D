@@ -174,7 +174,7 @@ public class TestGame implements ILogic {
             window.setResize(true);
         }
 
-        window.setClearColor(0.0f,0.0f,0.0f, 1.0f);
+        window.setClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         renderer.render(entity, camera);
     }
 
