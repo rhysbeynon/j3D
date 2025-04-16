@@ -1,3 +1,15 @@
+// -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
+// -|              04/16/2025 | DISCVRD Software              |-
+// -|        j3D is a lightweight custom-built engine         |-
+// -|        Made with LWJGL, openGL, JOML, and other         |-
+// -|        helpful libraries for use on DiscardSoft         |-
+// -|              Object Loader class for j3D                |-
+// -|    Comments are always written above relevant context.  |-
+// -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
+// -|               Version: 0.1 In Development               |-
+// -|   *some comments may be written by AI for convenience   |-
+// -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
+
 package com.discardsoft.j3D.core;
 
 import com.discardsoft.j3D.core.entity.Model;
@@ -15,20 +27,30 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ObjectLoader class is responsible for loading 3D models and textures
+ * into memory and preparing them for rendering. It manages the creation
+ * and cleanup of OpenGL resources such as VAOs, VBOs, and textures.
+ */
 public class ObjectLoader {
 
-    /*
-    We need vaos and vbos for the graphics pipeline.
-    VAOs are a list of vertices, while VBOs are
-    a list of VAOS, in a buffer to be rendered.
-     */
-    //Vertex Buffer Objects List
+    // Vertex Array Objects (VAOs) store the structure of vertex data.
     private List<Integer> vaos = new ArrayList<>();
-    //Vertex Array Objects list
+
+    // Vertex Buffer Objects (VBOs) store the actual vertex data.
     private List<Integer> vbos = new ArrayList<>();
-    //Texture Object List
+
+    // Textures store image data for rendering.
     private List<Integer> textures = new ArrayList<>();
 
+    /**
+     * Loads a 3D model into memory.
+     *
+     * @param vertices The vertex positions of the model.
+     * @param textureCoords The texture coordinates of the model.
+     * @param indices The indices defining the model's faces.
+     * @return A Model object containing the loaded data.
+     */
     public Model loadModel(float[] vertices, float[] textureCoords, int[] indices) {
         int id = createVAO();
         storeIndicesBuffer(indices);
@@ -38,6 +60,13 @@ public class ObjectLoader {
         return new Model(id, indices.length);
     }
 
+    /**
+     * Loads a texture from a file.
+     *
+     * @param path The file path to the texture.
+     * @return The OpenGL texture ID.
+     * @throws Exception If the texture cannot be loaded.
+     */
     public int loadTexture(String path) throws Exception {
         int width;
         int height;
@@ -48,19 +77,17 @@ public class ObjectLoader {
             IntBuffer channelBuffer = stack.mallocInt(1);
 
             buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelBuffer, 4);
-            if(buffer == null) {
-                //loads missing texture file if selection not found
+            if (buffer == null) {
+                // Load a default error texture if the specified texture is missing.
                 path = "src/main/resources/textures/errtex.png";
                 buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelBuffer, 4);
-                if(buffer == null) {
-                    //throws fit if missing texture file could be loaded (Should never happen)
+                if (buffer == null) {
                     throw new Exception("Failed to load " + path + " texture file: " + STBImage.stbi_failure_reason());
                 }
             }
 
             width = widthBuffer.get();
             height = heightBuffer.get();
-
         }
 
         int id = GL11.glGenTextures();
@@ -73,6 +100,11 @@ public class ObjectLoader {
         return id;
     }
 
+    /**
+     * Creates a new Vertex Array Object (VAO).
+     *
+     * @return The ID of the created VAO.
+     */
     private int createVAO() {
         int id = GL30.glGenVertexArrays();
         vaos.add(id);
@@ -80,6 +112,11 @@ public class ObjectLoader {
         return id;
     }
 
+    /**
+     * Stores indices in an OpenGL Element Array Buffer.
+     *
+     * @param indices The indices to store.
+     */
     private void storeIndicesBuffer(int[] indices) {
         int vbo = GL15.glGenBuffers();
         vbos.add(vbo);
@@ -88,44 +125,41 @@ public class ObjectLoader {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
     }
 
+    /**
+     * Stores vertex data in an OpenGL Array Buffer.
+     *
+     * @param attributeNumber The attribute number in the VAO.
+     * @param vertexCount The number of components per vertex.
+     * @param data The vertex data to store.
+     */
     private void storeDataInAttributeList(int attributeNumber, int vertexCount, float[] data) {
-        //generate VBO as an integer
         int vbo = GL15.glGenBuffers();
-        //add generated buffer object to vbo list "vbos"
         vbos.add(vbo);
-        //bind buffer object using openGL
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vbo);
-        //Store vbo in buffer using our own method, and flip the order to be read from old-new
         FloatBuffer buffer = Utils.storeDataInFloatBuffer(data);
-        //assigning data to our buffer so it draws normally
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
-        //more openGL information to pass over. We make sure openGL uses floats for the buffer.
         GL20.glVertexAttribPointer(attributeNumber, vertexCount, GL11.GL_FLOAT, false, 0, 0);
-        //we then arbitrarily bind the buffer to 0
         GL15.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
     }
 
-    /*
-    Cleanup method for models
+    /**
+     * Cleans up OpenGL resources used by the ObjectLoader.
+     * Deletes all VAOs, VBOs, and textures created by this class.
      */
     public void cleanup() {
-        //for every VAO, delete it.
         for (int vao : vaos) {
             GL30.glDeleteVertexArrays(vao);
         }
-        //for every VBO, delete that as well.
         for (int vbo : vbos) {
             GL30.glDeleteBuffers(vbo);
         }
-        //for every texture, delete those too.
         for (int texture : textures) {
             GL11.glDeleteTextures(texture);
         }
     }
 
-    /*
-    simple opengl function to bind the VAO to a zero value.
-    This effectively unbinds the VAO.
+    /**
+     * Unbinds the currently bound VAO.
      */
     private void unbind() {
         GL30.glBindVertexArray(0);

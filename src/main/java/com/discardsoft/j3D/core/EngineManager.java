@@ -1,3 +1,15 @@
+// -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
+// -|              04/16/2025 | DISCVRD Software              |-
+// -|        j3D is a lightweight custom-built engine         |-
+// -|        Made with LWJGL, openGL, JOML, and other         |-
+// -|        helpful libraries for use on DiscardSoft         |-
+// -|              Engine Manager class for j3D               |-
+// -|    Comments are always written above relevant context.  |-
+// -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
+// -|               Version: 0.1 In Development               |-
+// -|   *some comments may be written by AI for convenience   |-
+// -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
+
 package com.discardsoft.j3D.core;
 
 import com.discardsoft.j3D.Main;
@@ -5,6 +17,12 @@ import com.discardsoft.j3D.core.utils.Consts;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
+/*
+ * The EngineManager class is the main loop controller for the j3D engine.
+ * It handles the initialization, game loop, and cleanup of the engine.
+ * This class is responsible for ensuring that the game logic and rendering
+ * are executed in a consistent and efficient manner.
+ */
 public class EngineManager {
 
     /*

@@ -1,13 +1,30 @@
-/***********************************************************|-
- -|      04/10/2025 | DISCVRD Software | Rhys Beynon        |-
- -|        j3D is a lightweight custom-built engine         |-
- -|        Made with LWJGL, openGL, JOML, and other         |-
- -|        helpful libraries for use on DiscardSoft         |-
- -|           Main class and entry point for j3D            |-
- -|    Comments are always written above relevant context.  |-
- -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
- -|               Version: 0.1 In Development               |-
- -|**********************************************************/
+// -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
+// -|                     .--,-``-.                           |-
+// -|                    /   /     '.      ,---,              |-
+// -|                   / ../        ;   .'  .' `\            |-
+// -|               .--.\ ``\  .`-    ',---.'     \           |- 
+// -|             .--,`| \___\/   \   :|   |  .`\  |          |-
+// -|             |  |.       \   :   |:   : |  '  |          |-
+// -|             '--`_       /  /   / |   ' '  ;  :          |-
+// -|             ,--,'|      \  \   \ '   | ;  .  |          |-
+// -|             |  | '  ___ /   :   ||   | :  |  '          |-
+// -|             :  | | /   /\   /   :'   : | /  ;           |-
+// -|           __|  : '/ ,,/  ',-    .|   | '` ,/            |-
+// -|         .'__/\_: |\ ''\        ; ;   :  .'              |-
+// -|         |   :    : \   \     .'  |   ,.'                |-
+// -|          \   \  /   `--`-,,-'    '---'                  |-
+// -|           `--`-' 04/16/2025 | DISCVRD Software          |-
+// -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
+// -|        j3D is a lightweight custom-built engine         |-
+// -|        Made with LWJGL, openGL, JOML, and other         |-
+// -|        helpful libraries for use on DiscardSoft         |-
+// -|           Main class and entrypoint for j3D             |-
+// -|    Comments are always written above relevant context.  |-
+// -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
+// -|               Version: 0.1 In Development               |-
+// -|                                                         |-
+// -|   *some comments may be written by AI for convenience   |-
+// -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
 package com.discardsoft.j3D;
 
