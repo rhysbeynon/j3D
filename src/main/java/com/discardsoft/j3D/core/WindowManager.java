@@ -42,7 +42,7 @@ public class WindowManager {
     // Add fields to track mouse position and sensitivity
     private double lastMouseX, lastMouseY;
     private boolean firstMouse = true;
-    private final float mouseSensitivity = 0.1f;
+    private final float mouseSensitivity = Consts.MOUSE_SENSITIVITY;
 
     public WindowManager(String title, int width, int height, boolean vsync) {
         this.title = title;
@@ -115,6 +115,16 @@ public class WindowManager {
         window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if(window == MemoryUtil.NULL) {
             throw new RuntimeException("Problem creating GLFW window using GLFW.glfwCreateWindow() (Window ID is NULL)");
+        }
+
+        /*
+        * Here we set the correct cursor type
+        * for the window. This is a standard for 3D games
+        * that use the mouse as a camera controller.
+        */
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+        if(GLFW.glfwRawMouseMotionSupported()) {
+            GLFW.glfwSetInputMode(window, GLFW.GLFW_RAW_MOUSE_MOTION, GLFW.GLFW_TRUE);
         }
 
         /*
@@ -289,35 +299,24 @@ public class WindowManager {
         return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
     }
 
-    // Add a method to grab the mouse
-    public void grabMouse() {
-        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
-    }
-
-    // Add a method to process mouse movement
+    // method to process mouse movement
     public Vector2f processMouseMovement() {
         double[] xPos = new double[1];
         double[] yPos = new double[1];
         GLFW.glfwGetCursorPos(window, xPos, yPos);
 
-        double mouseX = xPos[0];
-        double mouseY = yPos[0];
-
-        double deltaX = 0;
-        double deltaY = 0;
+        double deltaX = xPos[0] - lastMouseX;
+        double deltaY = yPos[0] - lastMouseY;
 
         if (firstMouse) {
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
+            deltaX = 0;
+            deltaY = 0;
             firstMouse = false;
-        } else {
-            deltaX = mouseX - lastMouseX;
-            deltaY = lastMouseY - mouseY; // Inverted Y-axis
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
         }
 
-        // Invert the vertical mouse movement by negating deltaY
-        return new Vector2f((float) deltaX * mouseSensitivity, (float) -deltaY * mouseSensitivity);
+        lastMouseX = xPos[0];
+        lastMouseY = yPos[0];
+
+        return new Vector2f((float) deltaX * mouseSensitivity, (float) deltaY * mouseSensitivity);
     }
 }
