@@ -110,7 +110,7 @@ public class WindowManager {
         The function requires our Width variable, Height variable, and our Title string.
         As well as 2 NULL values specifically from the MemoryUtil class.
         The actual value of NULL here is "0L" and is a LONG var type.
-        JUST "NULL" OR "0" WONT WORK. THIS MUST BE "(long) 0L"
+        JUST "NULL" OR "0" WON'T WORK. THIS MUST BE "(long) 0L"
          */
         window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if(window == MemoryUtil.NULL) {
@@ -121,6 +121,8 @@ public class WindowManager {
         * Here we set the correct cursor type
         * for the window. This is a standard for 3D games
         * that use the mouse as a camera controller.
+        * We also attempt to use RAW MOUSE INPUT which
+        * is very, very, super highly preferable.
         */
         GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
         if(GLFW.glfwRawMouseMotionSupported()) {
