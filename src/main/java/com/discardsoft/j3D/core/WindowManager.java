@@ -12,6 +12,7 @@
 
 package com.discardsoft.j3D.core;
 
+import com.discardsoft.j3D.core.utils.Consts;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -24,9 +25,9 @@ import org.lwjgl.system.MemoryUtil;
 public class WindowManager {
 
     //CONSTANT VARS for window management
-    public static final float FOV = (float) Math.toRadians(60);
-    public static final float Z_NEAR = 0.001f;
-    public static final float Z_FAR = 10000f;
+    public static final float FOV = Consts.FOV;
+    public static final float Z_NEAR = Consts.Z_NEAR;
+    public static final float Z_FAR = Consts.Z_FAR;
 
     private final String title;
 
