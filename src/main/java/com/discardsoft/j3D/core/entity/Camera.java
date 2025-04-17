@@ -55,4 +55,17 @@ public class Camera {
     public Vector3f getRotation() {
         return rotation;
     }
+
+    // Add a method to rotate the camera based on mouse movement
+    public void rotateCamera(float deltaYaw, float deltaPitch) {
+        rotation.y += deltaYaw; // Yaw
+        rotation.x += deltaPitch; // Pitch
+
+        // Constrain pitch to avoid flipping
+        if (rotation.x > 90.0f) {
+            rotation.x = 90.0f;
+        } else if (rotation.x < -90.0f) {
+            rotation.x = -90.0f;
+        }
+    }
 }
