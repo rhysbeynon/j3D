@@ -21,11 +21,15 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The ObjectLoader class is responsible for loading 3D models and textures
@@ -45,11 +49,6 @@ public class ObjectLoader {
 
     /**
      * Loads a 3D model into memory.
-     *
-     * @param vertices The vertex positions of the model.
-     * @param textureCoords The texture coordinates of the model.
-     * @param indices The indices defining the model's faces.
-     * @return A Model object containing the loaded data.
      */
     public Model loadModel(float[] vertices, float[] textureCoords, int[] indices) {
         int id = createVAO();
@@ -62,10 +61,6 @@ public class ObjectLoader {
 
     /**
      * Loads a texture from a file.
-     *
-     * @param path The file path to the texture.
-     * @return The OpenGL texture ID.
-     * @throws Exception If the texture cannot be loaded.
      */
     public int loadTexture(String path) throws Exception {
         int width;
@@ -98,6 +93,115 @@ public class ObjectLoader {
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         STBImage.stbi_image_free(buffer);
         return id;
+    }
+
+    /**
+     * Imports a 3D model from an OBJ file, including vertices, texture coordinates, and normals.
+     *
+     * @param filePath The path to the OBJ file.
+     * @return A Model object containing the loaded data.
+     * @throws Exception If the file cannot be read or parsed.
+     */
+    public Model importOBJ(String filePath) throws Exception {
+        List<Float> vertices = new ArrayList<>();
+        List<Float> textureCoords = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
+        Map<String, Integer> uniqueVertices = new HashMap<>();
+        List<Float> finalVertices = new ArrayList<>();
+        List<Float> finalTextureCoords = new ArrayList<>();
+        List<Float> finalNormals = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(" ");
+                switch (tokens[0]) {
+                    case "v": // Vertex position
+                        vertices.add(Float.parseFloat(tokens[1]));
+                        vertices.add(Float.parseFloat(tokens[2]));
+                        vertices.add(Float.parseFloat(tokens[3]));
+                        break;
+                    case "vt": // Texture coordinate
+                        textureCoords.add(Float.parseFloat(tokens[1]));
+                        textureCoords.add(Float.parseFloat(tokens[2]));
+                        break;
+                    case "vn": // Normal vector
+                        normals.add(Float.parseFloat(tokens[1]));
+                        normals.add(Float.parseFloat(tokens[2]));
+                        normals.add(Float.parseFloat(tokens[3]));
+                        break;
+                    case "f": // Face (indices)
+                        for (int i = 1; i < tokens.length; i++) {
+                            String[] parts = tokens[i].split("/");
+                            int vertexIndex = Integer.parseInt(parts[0]) - 1;
+                            int textureIndex = parts.length > 1 && !parts[1].isEmpty() ? Integer.parseInt(parts[1]) - 1 : -1;
+                            int normalIndex = parts.length > 2 && !parts[2].isEmpty() ? Integer.parseInt(parts[2]) - 1 : -1;
+
+                            // Create a unique key for the vertex combination
+                            String key = vertexIndex + "/" + textureIndex + "/" + normalIndex;
+                            if (!uniqueVertices.containsKey(key)) {
+                                // Add vertex position
+                                finalVertices.add(vertices.get(vertexIndex * 3));
+                                finalVertices.add(vertices.get(vertexIndex * 3 + 1));
+                                finalVertices.add(vertices.get(vertexIndex * 3 + 2));
+
+                                // Add texture coordinate if available
+                                if (textureIndex != -1) {
+                                    finalTextureCoords.add(textureCoords.get(textureIndex * 2));
+                                    finalTextureCoords.add(textureCoords.get(textureIndex * 2 + 1));
+                                } else {
+                                    finalTextureCoords.add(0.0f);
+                                    finalTextureCoords.add(0.0f);
+                                }
+
+                                // Add normal vector if available
+                                if (normalIndex != -1) {
+                                    finalNormals.add(normals.get(normalIndex * 3));
+                                    finalNormals.add(normals.get(normalIndex * 3 + 1));
+                                    finalNormals.add(normals.get(normalIndex * 3 + 2));
+                                } else {
+                                    finalNormals.add(0.0f);
+                                    finalNormals.add(0.0f);
+                                    finalNormals.add(0.0f);
+                                }
+
+                                // Store the index of this unique vertex
+                                uniqueVertices.put(key, uniqueVertices.size());
+                            }
+
+                            // Add the index to the indices list
+                            indices.add(uniqueVertices.get(key));
+                        }
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load model: " + filePath + ".");
+            return importOBJ("src/main/resources/models/errmodel.obj");
+        }
+
+        float[] verticesArray = new float[finalVertices.size()];
+        for (int i = 0; i < finalVertices.size(); i++) {
+            verticesArray[i] = finalVertices.get(i);
+        }
+
+        float[] textureCoordsArray = new float[finalTextureCoords.size()];
+        for (int i = 0; i < finalTextureCoords.size(); i++) {
+            textureCoordsArray[i] = finalTextureCoords.get(i);
+        }
+
+        float[] normalsArray = new float[finalNormals.size()];
+        for (int i = 0; i < finalNormals.size(); i++) {
+            normalsArray[i] = finalNormals.get(i);
+        }
+
+        int[] indicesArray = new int[indices.size()];
+        for (int i = 0; i < indices.size(); i++) {
+            indicesArray[i] = indices.get(i);
+        }
+
+        return loadModel(verticesArray, textureCoordsArray, indicesArray);
     }
 
     /**

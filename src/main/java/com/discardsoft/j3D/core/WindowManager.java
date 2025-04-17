@@ -13,6 +13,7 @@
 package com.discardsoft.j3D.core;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -36,6 +37,11 @@ public class WindowManager {
     private boolean Vsync; // does window use Vsync?
 
     private final Matrix4f projectionMatrix;
+
+    // Add fields to track mouse position and sensitivity
+    private double lastMouseX, lastMouseY;
+    private boolean firstMouse = true;
+    private final float mouseSensitivity = 0.1f;
 
     public WindowManager(String title, int width, int height, boolean vsync) {
         this.title = title;
@@ -280,5 +286,37 @@ public class WindowManager {
     public Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
         float aspectRatio = (float) width / (float) height;
         return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+    }
+
+    // Add a method to grab the mouse
+    public void grabMouse() {
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+    }
+
+    // Add a method to process mouse movement
+    public Vector2f processMouseMovement() {
+        double[] xPos = new double[1];
+        double[] yPos = new double[1];
+        GLFW.glfwGetCursorPos(window, xPos, yPos);
+
+        double mouseX = xPos[0];
+        double mouseY = yPos[0];
+
+        double deltaX = 0;
+        double deltaY = 0;
+
+        if (firstMouse) {
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+            firstMouse = false;
+        } else {
+            deltaX = mouseX - lastMouseX;
+            deltaY = lastMouseY - mouseY; // Inverted Y-axis
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+        }
+
+        // Invert the vertical mouse movement by negating deltaY
+        return new Vector2f((float) deltaX * mouseSensitivity, (float) -deltaY * mouseSensitivity);
     }
 }
