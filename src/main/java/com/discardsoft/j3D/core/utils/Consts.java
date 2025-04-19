@@ -7,6 +7,9 @@ public class Consts {
     public static final String AUTHOR_STYLIZED = "DISCVRD";
     public static final String TITLE = "j3D";
 
+    public static final boolean DEV = true;
+    public static final boolean RESIZABLE = false;
+
     public static final float CAMERA_MOVE_SPEED = 0.05f;
     public static final float MOUSE_SENSITIVITY = 0.2f;
 

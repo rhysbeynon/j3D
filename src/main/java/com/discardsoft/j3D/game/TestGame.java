@@ -4,6 +4,7 @@ import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.*;
 import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.entity.Entity;
+import com.discardsoft.j3D.core.entity.Light;
 import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.entity.Texture;
 import com.discardsoft.j3D.core.utils.Consts;
@@ -14,6 +15,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public class TestGame implements ILogic {
+    private static final boolean dev = Consts.DEV;
+    private boolean wireframe = false;
 
     private static final float CAMERA_MOVE_SPEED = Consts.CAMERA_MOVE_SPEED;
 
@@ -23,6 +26,7 @@ public class TestGame implements ILogic {
 
     private Entity entity;
     private Camera camera;
+    private Light light;
 
     Vector3f cameraInc;
 
@@ -32,6 +36,7 @@ public class TestGame implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
+        light = new Light(new Vector3f(10.0f, 10.0f, 10.0f), new Vector3f(1.0f, 1.0f, 1.0f));
     }
 
     @Override
@@ -41,14 +46,26 @@ public class TestGame implements ILogic {
     
 
         // Model model = loader.loadModel(vertices, textureCoords, indices);
-        Model model = loader.importOBJ("src/main/resources/models/notarealmodel.obj");
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/notaeraltexture.png")));
+        Model model = loader.importOBJ("src/main/resources/models/suzanne.obj");
+        model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/grassblock.png")));
         entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
     }
 
     @Override
     public void input() {
         cameraInc.set(0.0f, 0.0f, 0.0f);
+
+        if (dev) {
+            if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_APOSTROPHE)) {
+                wireframe = !wireframe;
+                GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, wireframe ? GL11.GL_LINE : GL11.GL_FILL);
+                if (wireframe) {
+                    GL11.glDisable(GL11.GL_CULL_FACE);
+                } else {
+                    GL11.glEnable(GL11.GL_CULL_FACE);
+                }
+            }
+        }
 
         // WASD controls
         if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
@@ -79,7 +96,7 @@ public class TestGame implements ILogic {
     public void update() {
         camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED, cameraInc.y * CAMERA_MOVE_SPEED, cameraInc.z * CAMERA_MOVE_SPEED);
 
-        entity.incRot(0.0f, 0.95f, 0.0f);
+        entity.incRot(0.0f, 0.5f, 0.0f);
     }
 
     @Override
@@ -89,8 +106,8 @@ public class TestGame implements ILogic {
             window.setResize(true);
         }
 
-        window.setClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        renderer.render(entity, camera);
+        window.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        renderer.render(entity, camera, light);
     }
 
     @Override

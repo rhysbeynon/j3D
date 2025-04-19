@@ -50,11 +50,12 @@ public class ObjectLoader {
     /**
      * Loads a 3D model into memory.
      */
-    public Model loadModel(float[] vertices, float[] textureCoords, int[] indices) {
+    public Model loadModel(float[] vertices, float[] textureCoords, float[] normalsArray, int[] indices) {
         int id = createVAO();
         storeIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, vertices);
         storeDataInAttributeList(1, 2, textureCoords);
+        storeDataInAttributeList(2, 3, normalsArray);
         unbind();
         return new Model(id, indices.length);
     }
@@ -201,7 +202,7 @@ public class ObjectLoader {
             indicesArray[i] = indices.get(i);
         }
 
-        return loadModel(verticesArray, textureCoordsArray, indicesArray);
+        return loadModel(verticesArray, textureCoordsArray, normalsArray, indicesArray);
     }
 
     /**

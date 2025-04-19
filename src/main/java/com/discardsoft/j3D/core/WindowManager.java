@@ -21,6 +21,8 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
+import java.util.Map;
+import java.util.HashMap;
 
 public class WindowManager {
 
@@ -34,10 +36,12 @@ public class WindowManager {
     private int width, height; // width and height of window
     private long window; // unique, auto-generated window ID used by GLFW.
 
-    private boolean resize; // is window resizable?
+    private boolean resize = Consts.RESIZABLE; // is window resizable?
     private boolean Vsync; // does window use Vsync?
 
     private final Matrix4f projectionMatrix;
+
+    private final Map<Integer, Boolean> prevKeyStates = new HashMap<>(); // map to track key states
 
     // Add fields to track mouse position and sensitivity
     private double lastMouseX, lastMouseY;
@@ -193,8 +197,9 @@ public class WindowManager {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_STENCIL_TEST);
-//        GL11.glEnable(GL11.GL_CULL_FACE);
-//        GL11.glCullFace(GL11.GL_BACK);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glCullFace(GL11.GL_BACK);
+        GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
     }
 
     /*
@@ -234,6 +239,12 @@ public class WindowManager {
      */
     public boolean isKeyPressed(int key) {
         return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
+    }
+    public boolean isKeyPressedBuffered(int key) {
+        boolean curr = isKeyPressed(key);
+        boolean prev = prevKeyStates.getOrDefault(key, false);
+        prevKeyStates.put(key, curr);
+        return curr && !prev;
     }
 
     /*

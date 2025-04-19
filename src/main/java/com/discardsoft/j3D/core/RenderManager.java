@@ -15,9 +15,11 @@ package com.discardsoft.j3D.core;
 import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.entity.Entity;
+import com.discardsoft.j3D.core.entity.Light;
 import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.utils.Transformation;
 import com.discardsoft.j3D.core.utils.Utils;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
@@ -36,25 +38,40 @@ public class RenderManager {
         shader.createVertexShader(Utils.loadResource("/shaders/vertex.vs"));
         shader.createFragmentShader(Utils.loadResource("/shaders/fragment.fs"));
         shader.link();
+        //model uniforms
         shader.createUniform("textureSampler");
         shader.createUniform("transformationMatrix");
         shader.createUniform("projectionMatrix");
         shader.createUniform("viewMatrix");
 
+        //vertex shading uniforms (gouraud shading)
+        shader.createUniform("lightPosition");
+        shader.createUniform("lightColor");
+        shader.createUniform("ambientLight");
+        shader.createUniform("cameraPosition");
     }
 
-    public void render(Entity entity, Camera camera) {
+    public void render(Entity entity, Camera camera, Light light) {
         clear();
         shader.bind();
+
+        //set texture and transformation matrix uniforms
         shader.setUniform("textureSampler", 0);
         shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity));
         shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
 
+        //set light uniforms
+        shader.setUniform("lightPosition", light.getPosition()); //set light to camera position
+        shader.setUniform("lightColor", light.getColor());
+        shader.setUniform("ambientLight", new Vector3f(0.2f, 0.2f, 0.2f)); // Set ambient light to maximum for testing
+        shader.setUniform("cameraPosition", camera.getPosition());
+
         GL30.glBindVertexArray(entity.getModel().getId());
         //use our previously set index value of 0 (arbitrary)
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2); // Enable normals
         GL15.glActiveTexture(GL15.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, entity.getModel().getTexture().getId());
         //disables texture filtering
@@ -64,6 +81,7 @@ public class RenderManager {
         //unset all the values after using them
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2); // Disable normals
         GL30.glBindVertexArray(0);
         shader.unbind();
     }
