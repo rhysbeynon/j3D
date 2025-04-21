@@ -9,16 +9,17 @@ import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.entity.Texture;
 import com.discardsoft.j3D.core.utils.Consts;
 
+import com.discardsoft.j3D.core.utils.Settings;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public class TestGame implements ILogic {
-    private static final boolean dev = Consts.DEV;
+    private static final boolean dev = Settings.DEV;
     private boolean wireframe = false;
 
-    private static final float CAMERA_MOVE_SPEED = Consts.CAMERA_MOVE_SPEED;
+    private static final float CAMERA_MOVE_SPEED = Settings.CAMERA_MOVE_SPEED;
 
     private final RenderManager renderer;
     private final ObjectLoader loader;
@@ -48,7 +49,7 @@ public class TestGame implements ILogic {
         // Model model = loader.loadModel(vertices, textureCoords, indices);
         Model model = loader.importOBJ("src/main/resources/models/suzanne.obj");
         model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/grassblock.png")));
-        entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
+        entity = new  Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
     }
 
     @Override

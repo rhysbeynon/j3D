@@ -13,6 +13,7 @@
 package com.discardsoft.j3D.core;
 
 import com.discardsoft.j3D.core.utils.Consts;
+import com.discardsoft.j3D.core.utils.Settings;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -27,7 +28,7 @@ import java.util.HashMap;
 public class WindowManager {
 
     //CONSTANT VARS for window management
-    public static final float FOV = Consts.FOV;
+    public static final float FOV = Settings.FOV;
     public static final float Z_NEAR = Consts.Z_NEAR;
     public static final float Z_FAR = Consts.Z_FAR;
 
@@ -36,7 +37,7 @@ public class WindowManager {
     private int width, height; // width and height of window
     private long window; // unique, auto-generated window ID used by GLFW.
 
-    private boolean resize = Consts.RESIZABLE; // is window resizable?
+    private boolean resize = Settings.RESIZABLE; // is window resizable?
     private boolean Vsync; // does window use Vsync?
 
     private final Matrix4f projectionMatrix;
@@ -46,13 +47,12 @@ public class WindowManager {
     // Add fields to track mouse position and sensitivity
     private double lastMouseX, lastMouseY;
     private boolean firstMouse = true;
-    private final float mouseSensitivity = Consts.MOUSE_SENSITIVITY;
 
-    public WindowManager(String title, int width, int height, boolean vsync) {
+    public WindowManager(String title, int width, int height) {
         this.title = title;
         this.width = width;
         this.height = height;
-        Vsync = vsync;
+        Vsync = Settings.VSYNC;
         projectionMatrix = new Matrix4f();
     }
 
@@ -330,6 +330,7 @@ public class WindowManager {
         lastMouseX = xPos[0];
         lastMouseY = yPos[0];
 
+        float mouseSensitivity = Settings.MOUSE_SENSITIVITY;
         return new Vector2f((float) deltaX * mouseSensitivity, (float) deltaY * mouseSensitivity);
     }
 }

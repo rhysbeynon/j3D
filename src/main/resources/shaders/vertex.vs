@@ -34,7 +34,7 @@ void main() {
     //specular highlights (3rd pass)
     vec3 viewDir = normalize(cameraPosition - worldPosition.xyz);
     vec3 reflectDir = reflect(-lightDir, worldNormal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0); //reflectivity
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0); //reflectivity
     vec3 specular = spec * lightColor;
 
     //all passes combined
