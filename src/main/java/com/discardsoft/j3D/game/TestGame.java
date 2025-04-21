@@ -7,8 +7,8 @@ import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Light;
 import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.entity.Texture;
-import com.discardsoft.j3D.core.utils.Consts;
 
+import com.discardsoft.j3D.core.utils.LoadModel;
 import com.discardsoft.j3D.core.utils.Settings;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
@@ -44,11 +44,9 @@ public class TestGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-    
 
-        // Model model = loader.loadModel(vertices, textureCoords, indices);
-        Model model = loader.importOBJ("src/main/resources/models/suzanne.obj");
-        model.setTexture(new Texture(loader.loadTexture("src/main/resources/textures/grassblock.png")));
+        Model model = LoadModel.model("P_Cube");
+
         entity = new  Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
     }
 

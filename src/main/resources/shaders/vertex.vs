@@ -29,7 +29,7 @@ void main() {
     //ambient light (1st pass)
     vec3 ambient = ambientLight;
     //diffuse light (2nd pass)
-    float diff = max(dot(worldNormal, lightDir), 0.0);
+    float diff = max(dot(worldNormal, lightDir), 0.2);
     vec3 diffuse = diff * lightColor;
     //specular highlights (3rd pass)
     vec3 viewDir = normalize(cameraPosition - worldPosition.xyz);
