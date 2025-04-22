@@ -96,12 +96,10 @@ public class ObjectLoader {
         return id;
     }
 
-    /**
+    /*
+     *
      * Imports a 3D model from an OBJ file, including vertices, texture coordinates, and normals.
      *
-     * @param filePath The path to the OBJ file.
-     * @return A Model object containing the loaded data.
-     * @throws Exception If the file cannot be read or parsed.
      */
     public Model importOBJ(String filePath) throws Exception {
         List<Float> vertices = new ArrayList<>();

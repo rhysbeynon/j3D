@@ -25,6 +25,8 @@ import org.lwjgl.system.MemoryUtil;
 import java.util.Map;
 import java.util.HashMap;
 
+import static org.lwjgl.opengl.GL11.glViewport;
+
 public class WindowManager {
 
     //CONSTANT VARS for window management
@@ -142,7 +144,7 @@ public class WindowManager {
         GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
             this.width = width;
             this.height = height;
-            this.setResize(true);
+            glViewport(0,0,width,height);
         });
 
         /*
@@ -210,6 +212,7 @@ public class WindowManager {
     public void update() {
         GLFW.glfwSwapBuffers(window);
         GLFW.glfwPollEvents();
+
     }
 
     /*

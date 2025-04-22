@@ -37,17 +37,17 @@ public class TestGame implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
-        light = new Light(new Vector3f(10.0f, 10.0f, 10.0f), new Vector3f(1.0f, 1.0f, 1.0f));
+        light = new Light(new Vector3f(10.0f, 10.0f, 10.0f), new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0.2f, 0.2f, 0.2f));
     }
 
     @Override
     public void init() throws Exception {
         renderer.init();
 
-
+        //TODO change to model[] or model hashmap<>
         Model model = LoadModel.model("P_Cube");
-
-        entity = new  Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
+        //TODO change Entity class to take in and render
+        entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
     }
 
     @Override

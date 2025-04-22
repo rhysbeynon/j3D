@@ -40,7 +40,7 @@ public class Main {
     private static TestGame game;
 
     public static void main(String[] args) {
-        System.out.println("Starting j3D. Version: " + Consts.VERSION);
+        System.out.println("Starting j3D. (" + Consts.VERSION + ")");
         System.out.println("LWJGL Version: " + Version.getVersion());
         window = new WindowManager(Consts.TITLE, 800, 600);
         game = new TestGame();

@@ -51,6 +51,7 @@ public class RenderManager {
         shader.createUniform("cameraPosition");
     }
 
+    //TODO - change render method to use entity LIST/HASHMAP.
     public void render(Entity entity, Camera camera, Light light) {
         clear();
         shader.bind();
@@ -64,7 +65,7 @@ public class RenderManager {
         //set light uniforms
         shader.setUniform("lightPosition", light.getPosition()); //set light to camera position
         shader.setUniform("lightColor", light.getColor());
-        shader.setUniform("ambientLight", new Vector3f(0.2f, 0.2f, 0.2f)); // Set ambient light to maximum for testing
+        shader.setUniform("ambientLight", light.getAmbient()); // Set ambient light to maximum for testing
         shader.setUniform("cameraPosition", camera.getPosition());
 
         GL30.glBindVertexArray(entity.getModel().getId());
