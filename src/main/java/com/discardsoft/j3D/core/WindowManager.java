@@ -144,7 +144,7 @@ public class WindowManager {
         GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
             this.width = width;
             this.height = height;
-            glViewport(0,0,width,height);
+            glViewport(0,0,width, height);
         });
 
         /*
