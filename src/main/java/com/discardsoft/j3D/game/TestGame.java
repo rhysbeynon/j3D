@@ -37,7 +37,7 @@ public class TestGame implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
-        light = new Light(new Vector3f(10.0f, 10.0f, 10.0f), new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0.2f, 0.2f, 0.2f));
+        light = new Light(new Vector3f(10.0f, 10.0f, 10.0f), new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0.05f, 0.1f, 0.1f));
     }
 
     @Override
@@ -45,9 +45,9 @@ public class TestGame implements ILogic {
         renderer.init();
 
         //TODO change to model[] or model hashmap<>
-        Model model = LoadModel.model("P_Cube");
+        Model model = LoadModel.model("suzanne");
         //TODO change Entity class to take in and render
-        entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), 1.0f);
+        entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f));
     }
 
     @Override

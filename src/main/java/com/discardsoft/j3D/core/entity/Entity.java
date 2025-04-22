@@ -7,9 +7,9 @@ public class Entity {
     private Model model;
     private Vector3f pos;
     private Vector3f rot;
-    private float scale;
+    private Vector3f scale;
 
-    public Entity(Model model, Vector3f pos, Vector3f rot, float scale) {
+    public Entity(Model model, Vector3f pos, Vector3f rot, Vector3f scale) {
         this.model = model;
         this.pos = pos;
         this.rot = rot;

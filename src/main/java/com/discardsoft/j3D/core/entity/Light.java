@@ -10,7 +10,7 @@ public class Light {
     public Light() {
         this.position = new Vector3f(0, 0, 0);
         this.color = new Vector3f(1, 1, 1); // Default white light
-        this.ambient = new Vector3f(0.2f, 0.2f, 0.2f);
+        this.ambient = new Vector3f(0.2f, 0.2f, 0.15f);
     }
 
     public Light(Vector3f position, Vector3f color, Vector3f ambient) {
