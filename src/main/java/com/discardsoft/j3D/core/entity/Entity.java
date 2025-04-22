@@ -52,7 +52,7 @@ public class Entity {
         return rot;
     }
 
-    public float getScale() {
+    public Vector3f getScale() {
         return scale;
     }
 }
