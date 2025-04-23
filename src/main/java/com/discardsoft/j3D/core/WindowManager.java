@@ -6,7 +6,7 @@
 // -|              Window Manager class for j3D               |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.1 In Development               |-
+// -|               Version: 0.04a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
@@ -49,6 +49,15 @@ public class WindowManager {
     // Add fields to track mouse position and sensitivity
     private double lastMouseX, lastMouseY;
     private boolean firstMouse = true;
+    
+    // Track if cursor is currently captured for camera control
+    private boolean cursorCaptured = true;
+    
+    // Track if cursor is waiting for a click to resume capture
+    private boolean waitingForClick = false;
+
+    // Mouse button state tracking
+    private boolean leftMousePressed = false;
 
     public WindowManager(String title, int width, int height) {
         this.title = title;
@@ -76,6 +85,14 @@ public class WindowManager {
             throw new IllegalStateException("Problem starting GLFW using GLFW.glfwInit()");
         }
 
+        // Get the primary monitor's resolution
+        GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+        
+        // If resize is false and not already maximized, use the monitor's resolution
+        if (!resize && width != 0 && height != 0) {
+            width = vidMode.width() - 32;
+            height = vidMode.width() * 9 / 16;
+        }
 
         /*
         GLFW requires window "hints" to create a window.
@@ -145,6 +162,9 @@ public class WindowManager {
             this.width = width;
             this.height = height;
             glViewport(0,0,width, height);
+            // Update projection matrix with new aspect ratio
+            float aspectRatio = (float) width / (float) height;
+            projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
         });
 
         /*
@@ -172,7 +192,7 @@ public class WindowManager {
         if(maximized) {
             GLFW.glfwMaximizeWindow(window);
         } else {
-            GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+            vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
             GLFW.glfwSetWindowPos(window, (vidMode.width() - width) / 2, (vidMode.height() - height) / 2);
         }
 
@@ -335,5 +355,73 @@ public class WindowManager {
 
         float mouseSensitivity = Settings.MOUSE_SENSITIVITY;
         return new Vector2f((float) deltaX * mouseSensitivity, (float) deltaY * mouseSensitivity);
+    }
+
+    /**
+     * Releases the cursor from camera control mode.
+     * Makes the cursor visible and allows it to move freely within the window.
+     */
+    public void releaseCursor() {
+        if (cursorCaptured) {
+            GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            cursorCaptured = false;
+            waitingForClick = true;
+            // Reset first mouse to avoid camera jump when recapturing
+            firstMouse = true;
+        }
+    }
+
+    /**
+     * Captures the cursor for camera control.
+     * Hides the cursor and constrains it to the window for camera movement.
+     */
+    public void captureCursor() {
+        if (!cursorCaptured) {
+            GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+            cursorCaptured = true;
+            waitingForClick = false;
+            // Reset first mouse to avoid camera jump
+            firstMouse = true;
+        }
+    }
+    
+    /**
+     * Checks if the cursor is currently captured for camera control.
+     * 
+     * @return true if cursor is in camera control mode, false otherwise
+     */
+    public boolean isCursorCaptured() {
+        return cursorCaptured;
+    }
+    
+    /**
+     * Checks if the window is waiting for a click to recapture the cursor.
+     * 
+     * @return true if waiting for a click, false otherwise
+     */
+    public boolean isWaitingForClick() {
+        return waitingForClick;
+    }
+    
+    /**
+     * Checks if the left mouse button is currently pressed.
+     * 
+     * @return true if left mouse button is pressed, false otherwise
+     */
+    public boolean isMouseButtonPressed() {
+        return GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
+    }
+    
+    /**
+     * Checks if the left mouse button was just clicked (pressed and released).
+     * Similar to the buffered key press detection.
+     * 
+     * @return true if left mouse button was just clicked, false otherwise
+     */
+    public boolean isMouseButtonClicked() {
+        boolean curr = isMouseButtonPressed();
+        boolean result = curr && !leftMousePressed;
+        leftMousePressed = curr;
+        return result;
     }
 }

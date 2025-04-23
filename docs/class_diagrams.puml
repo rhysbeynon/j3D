@@ -1,0 +1,251 @@
+@startuml j3D Engine Architecture
+
+package "com.discardsoft.j3D" {
+  class Main {
+    - static WindowManager window
+    - static TestGame game
+    + static main(args: String[])
+    + static getWindow(): WindowManager
+    + static getGame(): TestGame
+  }
+
+  package "core" {
+    class EngineManager {
+      + static final NANOSECOND: long
+      + static final TARGET_FRAMERATE: float
+      - static fps: int
+      - static frameTime: float
+      - isRunning: boolean
+      - WindowManager window
+      - IGameLogic gameLogic
+      - init(): void
+      + start(): void
+      + run(): void
+      - stop(): void
+      - input(): void
+      - render(): void
+      - update(): void
+      - cleanup(): void
+      + static getFps(): float
+      + static setFps(fps: int): void
+    }
+    
+    interface IGameLogic {
+      + init(): void
+      + input(): void
+      + update(): void
+      + render(): void
+      + cleanup(): void
+    }
+    
+    class RenderManager {
+      - WindowManager window
+      - ShaderManager shader
+      + init(): void
+      + render(scene: IScene, camera: Camera): void
+      - renderEntity(entity: Entity): void
+      + render(entity: Entity, camera: Camera, light: Light): void
+      + clear(): void
+      + cleanup(): void
+    }
+    
+    class ShaderManager {
+      - programId: int
+      - vertexShaderId: int
+      - fragmentShaderId: int
+      - uniformLocations: Map<String, Integer>
+      + createUniform(uniformName: String): void
+      + setUniform(uniformName: String, value: Matrix4f): void
+      + setUniform(uniformName: String, value: Vector3f): void
+      + createVertexShader(shaderCode: String): void
+      + createFragmentShader(shaderCode: String): void
+      - createShader(shaderCode: String, shaderType: int): int
+      + link(): void
+      + bind(): void
+      + unbind(): void
+      + cleanup(): void
+    }
+    
+    class WindowManager {
+      - title: String
+      - width: int
+      - height: int
+      - window: long
+      - isResized: boolean
+      - mousePosition: Vector2f
+      - init(): void
+      + setClearColor(r: float, g: float, b: float, a: float): void
+      + isKeyPressed(keyCode: int): boolean
+      + isKeyPressedBuffered(keyCode: int): boolean
+      + windowShouldClose(): boolean
+      + update(): void
+      + cleanup(): void
+      + processMouseMovement(): Vector2f
+      + updateProjectionMatrix(): Matrix4f
+    }
+    
+    package "entity" {
+      class Entity {
+        - Model model
+        - Vector3f position
+        - Vector3f rotation
+        - Vector3f scale
+        + incrementPosition(x: float, y: float, z: float): void
+        + setPosition(x: float, y: float, z: float): void
+        + incrementRotation(x: float, y: float, z: float): void
+        + setRotation(x: float, y: float, z: float): void
+        + getModel(): Model
+        + getPosition(): Vector3f
+        + getRotation(): Vector3f
+        + getScale(): Vector3f
+      }
+      
+      class Model {
+        - vaoId: int
+        - vertexCount: int
+        - Texture texture
+        + getVaoId(): int
+        + getVertexCount(): int
+        + getTexture(): Texture
+        + setTexture(texture: Texture): void
+      }
+      
+      class Texture {
+        - textureId: int
+        + getTextureId(): int
+      }
+      
+      class Camera {
+        - Vector3f position
+        - Vector3f rotation
+        + movePosition(x: float, y: float, z: float): void
+        + setPosition(x: float, y: float, z: float): void
+        + addRotation(pitch: float, yaw: float, roll: float): void
+        + setRotation(pitch: float, yaw: float, roll: float): void
+        + getPosition(): Vector3f
+        + getRotation(): Vector3f
+        + rotateCamera(deltaYaw: float, deltaPitch: float): void
+      }
+      
+      class Light {
+        - Vector3f position
+        - Vector3f color
+        - Vector3f ambient
+        + getPosition(): Vector3f
+        + getColor(): Vector3f
+        + getAmbient(): Vector3f
+        + setPosition(x: float, y: float, z: float): void
+        + setColor(r: float, g: float, b: float): void
+        + setAmbient(r: float, g: float, b: float): void
+      }
+    }
+    
+    package "scene" {
+      interface IScene {
+        + initialize(): void
+        + update(deltaTime: float): void
+        + addEntity(entity: Entity): void
+        + removeEntity(entity: Entity): void
+        + getEntities(): List<Entity>
+        + getLight(): Light
+        + cleanup(): void
+      }
+      
+      abstract class BaseScene {
+        # List<Entity> entities
+        # Light light
+        + addEntity(entity: Entity): void
+        + removeEntity(entity: Entity): void
+        + getEntities(): List<Entity>
+        + getLight(): Light
+        # getMutableEntities(): List<Entity>
+        + update(deltaTime: float): void
+        + cleanup(): void
+      }
+      
+      class TestScene {
+        + initialize(): void
+        + update(deltaTime: float): void
+      }
+    }
+    
+    package "utils" {
+      class Utils {
+        + {static} storeDataInFloatBuffer(data: float[]): FloatBuffer
+        + {static} storeDataInIntBuffer(data: int[]): IntBuffer
+        + {static} loadResource(path: String): String
+      }
+      
+      class Transformation {
+        + {static} createTransformationMatrix(entity: Entity): Matrix4f
+        + {static} getViewMatrix(camera: Camera): Matrix4f
+      }
+      
+      class Settings {
+        + {static} DEV: boolean
+        + {static} RESIZABLE: boolean
+        + {static} VSYNC: boolean
+        + {static} CAMERA_MOVE_SPEED: float
+        + {static} MOUSE_SENSITIVITY: float
+        + {static} FOV: float
+      }
+      
+      class Consts {
+        + {static} VERSION: String
+        + {static} AUTHOR: String
+        + {static} TITLE: String
+        + {static} Z_NEAR: float
+        + {static} Z_FAR: float
+      }
+      
+      class LoadModel {
+        + {static} model(modelName: String): Model
+      }
+    }
+  }
+  
+  package "game" {
+    class TestGame {
+      - DEV_MODE: boolean
+      - wireframeMode: boolean
+      - CAMERA_MOVE_SPEED: float
+      - RenderManager renderer
+      - ObjectLoader loader
+      - WindowManager window
+      - TestScene scene
+      - Camera camera
+      - Vector3f cameraInc
+      - deltaTime: float
+      - lastFrameTime: long
+      + init(): void
+      + input(): void
+      - handleDevModeInput(): void
+      - handleMovementInput(): void
+      - handleCameraRotation(): void
+      + update(): void
+      + render(): void
+      + cleanup(): void
+    }
+  }
+}
+
+' Relationships
+Main ..> TestGame : creates
+Main ..> WindowManager : creates
+EngineManager --> IGameLogic : uses
+TestGame ..|> IGameLogic : implements
+TestGame --> TestScene : uses
+TestGame --> Camera : uses
+TestGame --> RenderManager : uses
+RenderManager --> ShaderManager : uses
+RenderManager --> IScene : renders
+IScene <|-- BaseScene
+BaseScene <|-- TestScene
+Entity --> Model : contains
+Model --> Texture : contains
+IScene --> Entity : manages
+IScene --> Light : contains
+BaseScene --> Entity : contains
+BaseScene --> Light : contains
+
+@enduml

@@ -8,39 +8,73 @@ import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-public class Utils {
+/**
+ * Utility class providing helper methods for common engine operations.
+ * <p>
+ * Contains methods for buffer management, resource loading, and other
+ * utility functions used throughout the engine.
+ * </p>
+ * 
+ * @author DISCVRD Software
+ * @version 0.1
+ */
+public final class Utils {
+    
+    /**
+     * Private constructor to prevent instantiation of utility class.
+     */
+    private Utils() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
 
-
-    /*
-    storeDataInFloatBuffer is the method for creating and handling
-    memory for data buffers for models and meshes.
-
+    /**
+     * Creates a FloatBuffer from a float array.
+     * <p>
+     * Allocates memory for the buffer, fills it with the provided data,
+     * and flips the buffer to prepare it for reading.
+     * </p>
+     *
+     * @param data The float array to store in the buffer
+     * @return A FloatBuffer containing the data
      */
     public static FloatBuffer storeDataInFloatBuffer(float[] data) {
-        //create a memory buffer for our data and add the data to it
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
-        //add data to the buffer and flip it so that we read in bottom-to-top
         buffer.put(data).flip();
-        //return buffer from function
         return buffer;
     }
 
+    /**
+     * Creates an IntBuffer from an int array.
+     * <p>
+     * Allocates memory for the buffer, fills it with the provided data,
+     * and flips the buffer to prepare it for reading.
+     * </p>
+     *
+     * @param data The int array to store in the buffer
+     * @return An IntBuffer containing the data
+     */
     public static IntBuffer storeDataInIntBuffer(int[] data) {
-        //create a memory buffer for our data and add the data to it
         IntBuffer buffer = MemoryUtil.memAllocInt(data.length);
-        //add data to the buffer and flip it so that we read in bottom-to-top
         buffer.put(data).flip();
-        //return buffer from function
         return buffer;
     }
 
+    /**
+     * Loads a text resource from the classpath.
+     * <p>
+     * Reads the entire contents of a text file and returns it as a string.
+     * </p>
+     *
+     * @param path The path to the resource, relative to the classpath
+     * @return The contents of the resource as a string
+     * @throws Exception If the resource cannot be read
+     */
     public static String loadResource(String path) throws Exception {
-        String result;
         try (InputStream in = Utils.class.getResourceAsStream(path);
              Scanner scanner = new Scanner(in, StandardCharsets.UTF_8.name())) {
-            result = scanner.useDelimiter("\\A").next();
+            return scanner.useDelimiter("\\A").next();
+        } catch (NullPointerException e) {
+            throw new Exception("Resource not found: " + path, e);
         }
-        return result;
     }
-
 }

@@ -9,5 +9,5 @@
 ``` -|               Central Repository for j3D                |-``` <br>
 ``` -|    Comments are always written above relevant context.  |-``` <br>
 ``` -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-``` <br>
-``` -|               Version: 0.1 In Development               |-``` <br>
+``` -|               Version: 0.04a In Development             |-``` <br>
 ``` -|**********************************************************/``` <br>

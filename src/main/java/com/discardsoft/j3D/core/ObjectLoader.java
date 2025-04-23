@@ -6,7 +6,7 @@
 // -|              Object Loader class for j3D                |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.1 In Development               |-
+// -|               Version: 0.04a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 

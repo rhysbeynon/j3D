@@ -3,114 +3,241 @@ package com.discardsoft.j3D.game;
 import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.*;
 import com.discardsoft.j3D.core.entity.Camera;
-import com.discardsoft.j3D.core.entity.Entity;
-import com.discardsoft.j3D.core.entity.Light;
-import com.discardsoft.j3D.core.entity.Model;
-import com.discardsoft.j3D.core.entity.Texture;
-
-import com.discardsoft.j3D.core.utils.LoadModel;
+import com.discardsoft.j3D.core.entity.Player;
+import com.discardsoft.j3D.core.scene.TestScene;
 import com.discardsoft.j3D.core.utils.Settings;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-public class TestGame implements ILogic {
-    private static final boolean dev = Settings.DEV;
-    private boolean wireframe = false;
+/**
+ * Test implementation of the game logic for demonstration and testing purposes.
+ * <p>
+ * Provides a simple 3D scene with a rotatable model, controllable camera, and basic lighting.
+ * Implements player movement with WASD keys, momentum-based physics, and mouse look controls.
+ * </p>
+ * 
+ * @author DISCVRD Software
+ * @version 0.1
+ */
+public class TestGame implements IGameLogic {
+    /** Flag for development mode features */
+    private static final boolean DEV_MODE = Settings.DEV;
+    
+    /** Toggle for wireframe rendering mode */
+    private boolean wireframeMode = false;
 
+    /** Speed multiplier for camera movement in free camera mode */
     private static final float CAMERA_MOVE_SPEED = Settings.CAMERA_MOVE_SPEED;
 
+    /** Rendering system reference */
     private final RenderManager renderer;
+    
+    /** Resource loader reference */
     private final ObjectLoader loader;
+    
+    /** Window management system reference */
     private final WindowManager window;
 
-    private Entity entity;
-    private Camera camera;
-    private Light light;
+    /** The test scene containing all game entities */
+    private TestScene scene;
+    
+    /** The player entity */
+    private Player player;
 
-    Vector3f cameraInc;
+    /** Vector for camera movement increments (used in free camera mode) */
+    private final Vector3f cameraInc;
+    
+    /** Time tracking for animation and physics */
+    private float deltaTime;
+    private long lastFrameTime;
 
+    /**
+     * Constructs a new TestGame instance.
+     * <p>
+     * Initializes rendering systems, window management, and camera.
+     * </p>
+     */
     public TestGame() {
         renderer = new RenderManager();
         window = Main.getWindow();
         loader = new ObjectLoader();
-        camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
-        light = new Light(new Vector3f(10.0f, 10.0f, 10.0f), new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0.05f, 0.1f, 0.1f));
     }
 
     @Override
     public void init() throws Exception {
+        // Initialize rendering system
         renderer.init();
-
-        //TODO change to model[] or model hashmap<>
-        Model model = LoadModel.model("suzanne");
-        //TODO change Entity class to take in and render
-        entity = new Entity(model, new Vector3f(0.0f, 0.0f, -5.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f));
+        
+        // Create and initialize the scene
+        scene = new TestScene();
+        scene.initialize();
+        
+        // Create player at origin
+        player = new Player(new Vector3f(0.0f, 0.0f, 0.0f));
+        
+        // Add player's bounding entity to the scene
+        scene.addEntity(player.getBoundingEntity());
+        
+        // Initialize time tracking for animations
+        lastFrameTime = System.currentTimeMillis();
     }
 
     @Override
     public void input() {
+        // Check for cursor control toggles first
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_ESCAPE)) {
+            window.releaseCursor();
+        } else if (window.isWaitingForClick() && window.isMouseButtonClicked()) {
+            window.captureCursor();
+        }
+        
+        // Skip movement input if cursor is not captured
+        if (!window.isCursorCaptured()) {
+            return;
+        }
+        
+        // Reset camera movement vector for free camera mode
         cameraInc.set(0.0f, 0.0f, 0.0f);
+        
+        // Player movement input (default to zero)
+        float forwardMovement = 0.0f;
+        float sidewaysMovement = 0.0f;
 
-        if (dev) {
-            if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_APOSTROPHE)) {
-                wireframe = !wireframe;
-                GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, wireframe ? GL11.GL_LINE : GL11.GL_FILL);
-                if (wireframe) {
-                    GL11.glDisable(GL11.GL_CULL_FACE);
-                } else {
-                    GL11.glEnable(GL11.GL_CULL_FACE);
-                }
+        // Development mode controls
+        if (DEV_MODE) {
+            handleDevModeInput();
+        }
+
+        // Movement controls
+        // Forward/backward movement (Z axis)
+        if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
+            if (player.isFreeCameraMode()) {
+                cameraInc.z = -1.0f;
+            } else {
+                forwardMovement = 1.0f;
             }
         }
-
-        // WASD controls
-        if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
-            cameraInc.z = -1.0f;
-        }
         if (window.isKeyPressed(GLFW.GLFW_KEY_S)) {
-            cameraInc.z = 1.0f;
+            if (player.isFreeCameraMode()) {
+                cameraInc.z = 1.0f;
+            } else {
+                forwardMovement = -1.0f;
+            }
         }
+        
+        // Left/right movement (X axis)
         if (window.isKeyPressed(GLFW.GLFW_KEY_A)) {
-            cameraInc.x = -1.0f;
+            if (player.isFreeCameraMode()) {
+                cameraInc.x = -1.0f;
+            } else {
+                sidewaysMovement = -1.0f;
+            }
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_D)) {
-            cameraInc.x = 1.0f;
+            if (player.isFreeCameraMode()) {
+                cameraInc.x = 1.0f;
+            } else {
+                sidewaysMovement = 1.0f;
+            }
         }
-        if (window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = 1.0f;
+        
+        // Up/down movement (Y axis - only in free camera mode)
+        if (player.isFreeCameraMode()) {
+            if (window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
+                cameraInc.y = 1.0f;
+            }
+            if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+                cameraInc.y = -1.0f;
+            }
         }
-        if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT_CONTROL) || window.isKeyPressed(GLFW.GLFW_KEY_C)) {
-            cameraInc.y = -1.0f;
+        
+        // Send player movement input if not in free camera mode
+        if (!player.isFreeCameraMode()) {
+            player.setMovementInput(forwardMovement, sidewaysMovement);
         }
-
-        // Process mouse movement for camera rotation
+        
+        // Camera rotation from mouse input (always active for look controls)
+        handleCameraRotation();
+    }
+    
+    /**
+     * Handles development-specific input controls.
+     */
+    private void handleDevModeInput() {
+        // Toggle wireframe mode
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_APOSTROPHE)) {
+            wireframeMode = !wireframeMode;
+            GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, wireframeMode ? GL11.GL_LINE : GL11.GL_FILL);
+            if (wireframeMode) {
+                GL11.glDisable(GL11.GL_CULL_FACE);
+            } else {
+                GL11.glEnable(GL11.GL_CULL_FACE);
+            }
+        }
+        
+        // Toggle free camera mode
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_C)) {
+            player.toggleFreeCamera();
+            System.out.println("Free camera mode: " + player.isFreeCameraMode());
+        }
+    }
+    
+    /**
+     * Handles mouse input for camera rotation.
+     */
+    private void handleCameraRotation() {
         Vector2f mouseDelta = window.processMouseMovement();
-        camera.rotateCamera(mouseDelta.x, mouseDelta.y);
+        player.getCamera().rotateCamera(mouseDelta.x, mouseDelta.y);
     }
 
     @Override
     public void update() {
-        camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED, cameraInc.y * CAMERA_MOVE_SPEED, cameraInc.z * CAMERA_MOVE_SPEED);
+        // Calculate delta time for smooth animations
+        long currentTime = System.currentTimeMillis();
+        deltaTime = (currentTime - lastFrameTime) / 1000.0f;
+        lastFrameTime = currentTime;
+        
+        // Update the player
+        player.update(deltaTime);
+        
+        // Update camera position when in free camera mode
+        if (player.isFreeCameraMode()) {
+            Camera camera = player.getCamera();
+            camera.movePosition(
+                cameraInc.x * CAMERA_MOVE_SPEED, 
+                cameraInc.y * CAMERA_MOVE_SPEED, 
+                cameraInc.z * CAMERA_MOVE_SPEED
+            );
+        }
 
-        entity.incRot(0.0f, 0.5f, 0.0f);
+        // Update scene entities
+        scene.update(deltaTime);
     }
 
     @Override
     public void render() {
+        // Handle window resize if needed
         if(window.isResize()) {
+            // Update viewport to match new window dimensions
             GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResize(true);
+            // Force update the projection matrix
+            window.updateProjectionMatrix();
+            window.setResize(false);  // Reset the resize flag
         }
 
-        window.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        renderer.render(entity, camera, light);
+        // Set window background to blue sky color
+        window.setClearColor(0.3f, 0.5f, 1.0f, 1.0f);
+        
+        // Render the scene using the player's camera
+        renderer.render(scene, player.getCamera());
     }
 
     @Override
     public void cleanup() {
+        scene.cleanup();
         renderer.cleanup();
         loader.cleanup();
     }
