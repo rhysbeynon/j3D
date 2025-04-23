@@ -1,12 +1,12 @@
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
-// -|              04/16/2025 | DISCVRD Software              |-
+// -|              04/16/2025 | DiscardSoft                   |-
 // -|        j3D is a lightweight custom-built engine         |-
 // -|        Made with LWJGL, openGL, JOML, and other         |-
 // -|        helpful libraries for use on DiscardSoft         |-
 // -|              Window Manager class for j3D               |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.04a In Development             |-
+// -|               Version: 0.05a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
@@ -58,6 +58,10 @@ public class WindowManager {
 
     // Mouse button state tracking
     private boolean leftMousePressed = false;
+
+    // Track scroll wheel movement
+    private double scrollOffset = 0.0;
+    private boolean hasScrolled = false;
 
     public WindowManager(String title, int width, int height) {
         this.title = title;
@@ -222,6 +226,12 @@ public class WindowManager {
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glCullFace(GL11.GL_BACK);
         GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+
+        // Set up the mouse scroll callback
+        GLFW.glfwSetScrollCallback(window, (windowHandle, xOffset, yOffset) -> {
+            scrollOffset = yOffset;
+            hasScrolled = true;
+        });
     }
 
     /*
@@ -422,6 +432,28 @@ public class WindowManager {
         boolean curr = isMouseButtonPressed();
         boolean result = curr && !leftMousePressed;
         leftMousePressed = curr;
+        return result;
+    }
+
+    /**
+     * Gets the mouse scroll wheel movement since the last call.
+     * 
+     * @return positive value for scroll up, negative for scroll down, zero for no scrolling
+     */
+    public double getScrollOffset() {
+        double result = scrollOffset;
+        scrollOffset = 0.0;
+        return result;
+    }
+    
+    /**
+     * Checks if the scroll wheel has been used since the last call.
+     * 
+     * @return true if scroll wheel was used, false otherwise
+     */
+    public boolean hasScrolled() {
+        boolean result = hasScrolled;
+        hasScrolled = false;
         return result;
     }
 }

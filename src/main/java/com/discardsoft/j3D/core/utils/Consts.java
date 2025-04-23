@@ -7,7 +7,7 @@ package com.discardsoft.j3D.core.utils;
  * including version information, branding, and rendering constants.
  * </p>
  * 
- * @author DISCVRD Software
+ * @author DiscardSoft
  * @version 0.1
  */
 public final class Consts {
@@ -21,8 +21,8 @@ public final class Consts {
 
     //---------- Version and Branding ----------//
     
-    /** Current engine version string */
-    public static final String VERSION = "v0.04a";
+    /** Engine version string displayed in window title and logs */
+    public static final String VERSION = "v0.05a";
     
     /** Author/company name */
     public static final String AUTHOR = "DiscardSoft";

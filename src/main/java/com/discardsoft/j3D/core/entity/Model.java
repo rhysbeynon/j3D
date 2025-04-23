@@ -1,13 +1,13 @@
 package com.discardsoft.j3D.core.entity;
 
 /**
- * Represents a 3D model that can be rendered in the game world.
+ * Represents a 3D model with texture in the rendering system.
  * <p>
- * A model consists of a vertex array object (VAO) ID, vertex count, and an optional texture.
- * The VAO ID points to the OpenGL vertex array object that contains the model's geometry data.
+ * This class holds the OpenGL references for a vertex array object (VAO) and
+ * a vertex count for rendering, along with an optional texture.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  * @see Texture
  */

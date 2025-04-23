@@ -1,12 +1,12 @@
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
-// -|              04/16/2025 | DISCVRD Software              |-
+// -|              04/16/2025 | DiscardSoft                   |-
 // -|        j3D is a lightweight custom-built engine         |-
 // -|        Made with LWJGL, openGL, JOML, and other         |-
 // -|        helpful libraries for use on DiscardSoft         |-
-// -|               ILogic interface for j3D                  |-
+// -|              IGameLogic interface for j3D               |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.1 In Development               |-
+// -|               Version: 0.05a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
@@ -21,7 +21,7 @@ package com.discardsoft.j3D.core;
  * and cleanup.
  * </p>
  *
- * @author DISCVRD Software
+ * @author DiscardSoft
  * @version 0.1
  */
 public interface IGameLogic {

@@ -1,13 +1,13 @@
 package com.discardsoft.j3D.core.utils;
 
 /**
- * Utility class for rendering debug information.
+ * Utility class for rendering text to the screen.
  * <p>
- * This is a simple implementation that outputs debug information to the console
- * rather than rendering text on screen, to avoid OpenGL compatibility issues.
+ * Provides simple 2D text rendering capabilities for debug information
+ * and user interface elements.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class TextRenderer {

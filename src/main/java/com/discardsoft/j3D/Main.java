@@ -13,7 +13,7 @@
 // -|         .'__/\_: |\ ''\        ; ;   :  .'              |-
 // -|         |   :    : \   \     .'  |   ,.'                |-
 // -|          \   \  /   `--`-,,-'    '---'                  |-
-// -|           `--`-' 04/23/2025 | DISCVRD Software          |-
+// -|           `--`-' 04/23/2025 | DiscardSoft               |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
 // -|        j3D is a lightweight custom-built engine         |-
 // -|        Made with LWJGL, openGL, JOML, and other         |-
@@ -21,7 +21,7 @@
 // -|           Main class and entrypoint for j3D             |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.04a In Development             |-
+// -|               Version: 0.05a In Development             |-
 // -|                                                         |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
@@ -42,7 +42,7 @@ import org.lwjgl.Version;
  * window and game instances.
  * </p>
  * 
- * @author DISCVRD Software
+ * @author DiscardSoft
  * @version 0.1
  */
 public class Main {

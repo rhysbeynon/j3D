@@ -4,14 +4,14 @@ import com.discardsoft.j3D.core.utils.LoadModel;
 import org.joml.Vector3f;
 
 /**
- * Represents a player entity in the game world.
+ * Represents a player entity with physics-based movement and camera controls.
  * <p>
- * The Player class combines a bounding capsule collision shape with
- * a camera positioned at eye level. It supports both standard physics-based
- * movement and a "free camera" mode for development purposes.
+ * This class combines a camera with a physical presence in the world,
+ * providing movement with momentum, collision detection, and support for
+ * both physics-based and free camera modes.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class Player {
@@ -254,5 +254,14 @@ public class Player {
      */
     public Vector3f getVelocity() {
         return velocity;
+    }
+    
+    /**
+     * Gets the player's camera coordinates.
+     *
+     * @return A Vector3f containing the camera's position coordinates
+     */
+    public Vector3f getPlayerCamera() {
+        return camera.getPosition();
     }
 }

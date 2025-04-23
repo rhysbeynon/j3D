@@ -7,13 +7,14 @@ import com.discardsoft.j3D.core.scene.TestScene;
 import org.joml.Vector3f;
 
 /**
- * Debug heads-up display for development and troubleshooting.
+ * Provides debugging information overlay for development.
  * <p>
- * Provides real-time information about game state, performance,
- * camera position, and other debug data when activated with F3.
+ * This class renders text-based debugging information to help
+ * during development, including FPS count, player position,
+ * and other useful metrics.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class DebugHUD {
@@ -38,8 +39,22 @@ public class DebugHUD {
      * @param fps Current frames per second
      * @param player The player entity
      * @param scene The current game scene
+     * @deprecated Use {@link #render(int, Player, TestScene, float)} instead
      */
+    @Deprecated
     public void render(int fps, Player player, TestScene scene) {
+        render(fps, player, scene, Settings.CAMERA_MOVE_SPEED);
+    }
+    
+    /**
+     * Renders the debug HUD with current game information including camera speed.
+     *
+     * @param fps Current frames per second
+     * @param player The player entity
+     * @param scene The current game scene
+     * @param cameraMoveSpeed Current camera movement speed
+     */
+    public void render(int fps, Player player, TestScene scene, float cameraMoveSpeed) {
         StringBuilder debugInfo = new StringBuilder();
         
         // Game information
@@ -57,6 +72,11 @@ public class DebugHUD {
         
         // Free camera mode status
         debugInfo.append("Camera mode: ").append(player.isFreeCameraMode() ? "FREE" : "PLAYER").append("\n");
+        
+        // Camera speed (only shown in free camera mode)
+        if (player.isFreeCameraMode()) {
+            debugInfo.append(String.format("Camera speed: %.2f (scroll to adjust)\n", cameraMoveSpeed));
+        }
         
         // Entity count
         int entityCount = scene.getEntities().size();

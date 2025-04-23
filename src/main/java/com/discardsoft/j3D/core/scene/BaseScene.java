@@ -9,14 +9,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Abstract base implementation of the IScene interface.
+ * Abstract base class for all scenes in the engine.
  * <p>
- * Provides common functionality for scene management that can be
- * extended by specific scene implementations. Handles entity collection
- * management and basic lighting setup.
+ * Provides common functionality for scene management including entity tracking,
+ * lighting setup, and scene lifecycle management.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public abstract class BaseScene implements IScene {

@@ -3,14 +3,13 @@ package com.discardsoft.j3D.core.entity;
 import org.joml.Vector3f;
 
 /**
- * Represents a light source in the 3D scene.
+ * Represents a light source in the 3D world.
  * <p>
- * A light has position, color, and ambient light properties that determine
- * how it illuminates objects in the scene. This is currently implemented as
- * a point light with ambient, diffuse, and specular components.
+ * This class models a light source with position, color, and ambient intensity
+ * for use in shading calculations.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class Light {

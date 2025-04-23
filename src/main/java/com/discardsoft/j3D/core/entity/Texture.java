@@ -1,15 +1,14 @@
 package com.discardsoft.j3D.core.entity;
 
 /**
- * Represents a texture that can be applied to a 3D model.
+ * Represents a texture used for rendering 3D models.
  * <p>
- * A texture is identified by its OpenGL texture ID, which points to the
- * texture data loaded into the GPU memory.
+ * This class wraps an OpenGL texture ID and filename for managing textures.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
- * @see Model
+* @see Model
  */
 public class Texture {
 

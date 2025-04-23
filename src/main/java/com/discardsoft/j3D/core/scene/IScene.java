@@ -6,14 +6,13 @@ import com.discardsoft.j3D.core.entity.Light;
 import java.util.List;
 
 /**
- * Interface defining the structure and behavior of a scene in the j3D engine.
+ * Interface defining the contract for all scenes in the engine.
  * <p>
- * A scene manages a collection of entities and lighting that make up a 
- * rendered environment. Implementations should handle entity management,
- * scene-specific logic, and resource lifecycle.
+ * A scene manages a collection of entities and lighting for a section
+ * of the game world that can be rendered as a unit.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public interface IScene {

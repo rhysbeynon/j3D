@@ -1,12 +1,12 @@
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
-// -|              04/16/2025 | DISCVRD Software              |-
+// -|              04/16/2025 | DiscardSoft                   |-
 // -|        j3D is a lightweight custom-built engine         |-
 // -|        Made with LWJGL, openGL, JOML, and other         |-
 // -|        helpful libraries for use on DiscardSoft         |-
 // -|              Render Manager class for j3D               |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.04a In Development             |-
+// -|               Version: 0.05a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
@@ -34,7 +34,7 @@ import java.util.List;
  * lighting and camera view transformations.
  * </p>
  * 
- * @author DISCVRD Software
+ * @author DiscardSoft
  * @version 0.1
  */
 public class RenderManager {

@@ -14,13 +14,14 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 /**
- * Test implementation of the game logic for demonstration and testing purposes.
+ * Test implementation of game logic.
  * <p>
- * Provides a simple 3D scene with a rotatable model, controllable camera, and basic lighting.
- * Implements player movement with WASD keys, momentum-based physics, and mouse look controls.
+ * This class demonstrates how to use the j3D engine by creating a simple
+ * test scene with various objects and lighting. It handles input processing,
+ * updates, and rendering through the IGameLogic interface.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class TestGame implements IGameLogic {
@@ -39,8 +40,20 @@ public class TestGame implements IGameLogic {
     /** Current FPS for debug display */
     private int currentFps;
 
-    /** Speed multiplier for camera movement in free camera mode */
-    private static final float CAMERA_MOVE_SPEED = Settings.CAMERA_MOVE_SPEED;
+    /** Default speed multiplier for camera movement in free camera mode */
+    private static final float DEFAULT_CAMERA_MOVE_SPEED = Settings.CAMERA_MOVE_SPEED;
+    
+    /** Current speed multiplier for camera movement in free camera mode */
+    private float currentCameraMoveSpeed = DEFAULT_CAMERA_MOVE_SPEED;
+    
+    /** Increment value for camera speed adjustment */
+    private static final float CAMERA_SPEED_INCREMENT = 0.01f;
+    
+    /** Minimum allowed camera speed */
+    private static final float MIN_CAMERA_SPEED = 0.01f;
+    
+    /** Maximum allowed camera speed */
+    private static final float MAX_CAMERA_SPEED = 0.5f;
 
     /** Rendering system reference */
     private final RenderManager renderer;
@@ -125,6 +138,12 @@ public class TestGame implements IGameLogic {
             handleDevModeInput();
         }
 
+        // Handle scroll wheel for camera speed adjustment - only in free camera mode
+        if (player.isFreeCameraMode() && window.hasScrolled()) {
+            double scrollOffset = window.getScrollOffset();
+            adjustCameraSpeed(scrollOffset);
+        }
+
         // Movement controls
         // Forward/backward movement (Z axis)
         if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
@@ -178,6 +197,27 @@ public class TestGame implements IGameLogic {
     }
     
     /**
+     * Adjusts the camera movement speed based on scroll wheel input.
+     * 
+     * @param scrollOffset The scroll wheel movement (positive for up, negative for down)
+     */
+    private void adjustCameraSpeed(double scrollOffset) {
+        if (scrollOffset > 0) {
+            // Scroll up - increase speed
+            currentCameraMoveSpeed += CAMERA_SPEED_INCREMENT;
+            if (currentCameraMoveSpeed > MAX_CAMERA_SPEED) {
+                currentCameraMoveSpeed = MAX_CAMERA_SPEED;
+            }
+        } else if (scrollOffset < 0) {
+            // Scroll down - decrease speed
+            currentCameraMoveSpeed -= CAMERA_SPEED_INCREMENT;
+            if (currentCameraMoveSpeed < MIN_CAMERA_SPEED) {
+                currentCameraMoveSpeed = MIN_CAMERA_SPEED;
+            }
+        }
+    }
+    
+    /**
      * Handles development-specific input controls.
      */
     private void handleDevModeInput() {
@@ -227,9 +267,9 @@ public class TestGame implements IGameLogic {
         if (player.isFreeCameraMode()) {
             Camera camera = player.getCamera();
             camera.movePosition(
-                cameraInc.x * CAMERA_MOVE_SPEED * deltaTime * 60.0f, 
-                cameraInc.y * CAMERA_MOVE_SPEED * deltaTime * 60.0f, 
-                cameraInc.z * CAMERA_MOVE_SPEED * deltaTime * 60.0f
+                cameraInc.x * currentCameraMoveSpeed * deltaTime * 60.0f, 
+                cameraInc.y * currentCameraMoveSpeed * deltaTime * 60.0f, 
+                cameraInc.z * currentCameraMoveSpeed * deltaTime * 60.0f
             );
         }
 
@@ -263,7 +303,7 @@ public class TestGame implements IGameLogic {
         
         // Render debug HUD if enabled
         if (showDebugHUD && debugHUD != null) {
-            debugHUD.render(currentFps, player, scene);
+            debugHUD.render(currentFps, player, scene, player.isFreeCameraMode() ? currentCameraMoveSpeed : DEFAULT_CAMERA_MOVE_SPEED);
         }
     }
 

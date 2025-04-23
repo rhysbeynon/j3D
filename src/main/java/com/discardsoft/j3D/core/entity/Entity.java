@@ -3,13 +3,13 @@ package com.discardsoft.j3D.core.entity;
 import org.joml.Vector3f;
 
 /**
- * Represents a renderable 3D entity in the game world.
+ * Base class for all renderable entities in the 3D world.
  * <p>
- * An entity is defined by its 3D model, position, rotation, and scale.
- * It provides methods to manipulate these properties for animation and movement.
+ * An entity represents a 3D object with position, rotation, and scale.
+ * It references a 3D model that defines its visual appearance.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class Entity {

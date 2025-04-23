@@ -3,14 +3,13 @@ package com.discardsoft.j3D.core.entity;
 import org.joml.Vector3f;
 
 /**
- * Represents a camera in 3D space that provides a view into the game world.
+ * First-person camera for navigating the 3D world.
  * <p>
- * The camera has position and rotation properties that determine what part
- * of the scene is visible. It provides methods to move and rotate the camera,
- * including first-person style movement relative to the camera's orientation.
+ * Provides position and rotation tracking for rendering the scene from a
+ * specific viewpoint, with methods for moving and rotating the camera.
  * </p>
- * 
- * @author DISCVRD Software
+ *
+ * @author DiscardSoft
  * @version 0.1
  */
 public class Camera {

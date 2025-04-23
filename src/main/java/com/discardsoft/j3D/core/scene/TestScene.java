@@ -1,24 +1,37 @@
 package com.discardsoft.j3D.core.scene;
 
+import com.discardsoft.j3D.Main;
+import com.discardsoft.j3D.core.ObjectLoader;
 import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Model;
+import com.discardsoft.j3D.core.entity.terrain.Terrain;
+import com.discardsoft.j3D.core.entity.terrain.TerrainEntity;
 import com.discardsoft.j3D.core.utils.LoadModel;
 import org.joml.Vector3f;
 
 /**
- * A test scene implementation for the j3D engine.
+ * Test implementation of a scene with sample entities.
  * <p>
- * This class extends BaseScene and demonstrates how to create a custom scene
- * by overriding initialization and update methods.
+ * This scene demonstrates how to create and organize entities
+ * using the scene system, including model loading and lighting.
  * </p>
  *
- * @author DISCVRD Software
+ * @author DiscardSoft
  * @version 0.1
  */
 public class TestScene extends BaseScene {
 
     // Reference to track the Suzanne model for animation
     private Entity suzanneEntity;
+    
+    // Reference to the terrain entity
+    private TerrainEntity terrainEntity;
+    
+    // Dimensions for the terrain
+    private static final float TERRAIN_SIZE = 512.0f;
+    private static final int TERRAIN_GRID_COUNT = 64; // 512/8 = 64 cells to get 8 unit grid cells
+    private static final float TERRAIN_HEIGHT = 0.0f; // Y-level 0
+    private static final float TEXTURE_REPEAT = 64.0f; // Repeat texture 64 times across terrain
 
     /**
      * Constructs a new test scene.
@@ -29,28 +42,63 @@ public class TestScene extends BaseScene {
     
     @Override
     public void initialize() {
+        try {
+            // Create terrain first (so it's drawn first)
+            createTerrain();
+            
+            // Add some additional models to the scene to show scale
+            addSceneModels();
+            
+            // Set custom light position - raised higher for better terrain lighting
+            getLight().setPosition(30.0f, 50.0f, 30.0f);
+            getLight().setAmbient(0.3f, 0.3f, 0.3f); // Increase ambient light for terrain
+            
+        } catch (Exception e) {
+            System.err.println("Error initializing test scene: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Creates and adds a terrain to the scene.
+     */
+    private void createTerrain() throws Exception {
+        // Get the object loader
+        ObjectLoader loader = new ObjectLoader();
+        
+        // Position the terrain so its center is at the origin
+        float halfSize = TERRAIN_SIZE / 2.0f;
+        Vector3f terrainPosition = new Vector3f(-halfSize, TERRAIN_HEIGHT, -halfSize);
+        
+        // Create the terrain with defaulttex texture
+        Terrain terrain = new Terrain(
+            TERRAIN_SIZE, 
+            TERRAIN_GRID_COUNT, 
+            TERRAIN_HEIGHT,
+            terrainPosition,
+            loader,
+            "src/main/resources/textures/defaulttex.png",
+            TEXTURE_REPEAT
+        );
+        
+        // Create an entity for the terrain and add it to the scene
+        terrainEntity = new TerrainEntity(terrain);
+        addEntity(terrainEntity);
+    }
+    
+    /**
+     * Adds various models to the scene to demonstrate scale and terrain usage.
+     */
+    private void addSceneModels() {
         // Add the classic Suzanne monkey head model
         Model suzanneModel = LoadModel.model("suzanne");
         suzanneEntity = new Entity(
             suzanneModel,
-            new Vector3f(0.0f, 0.0f, -5.0f),
+            new Vector3f(0.0f, 1.0f, -5.0f), // Raised above terrain
             new Vector3f(0.0f, 0.0f, 0.0f),
             new Vector3f(1.0f, 1.0f, 1.0f)
         );
         addEntity(suzanneEntity);
-        
-        // Set custom light position
-        getLight().setPosition(10.0f, 10.0f, 5.0f);
-        
-        // Optional: Add more entities
-        // Model cubeModel = LoadModel.model("P_Cube");
-        // Entity cube = new Entity(
-        //     cubeModel,
-        //     new Vector3f(3.0f, 0.0f, -5.0f),
-        //     new Vector3f(0.0f, 0.0f, 0.0f),
-        //     new Vector3f(0.5f, 0.5f, 0.5f)
-        // );
-        // addEntity(cube);
     }
     
     @Override

@@ -1,5 +1,5 @@
 # j3D Engine Manual
-**Version 0.03a | April 23, 2025**
+**Version 0.05a | April 23, 2025**
 
 <div align="center">
   <img src="src/main/resources/j3D_DARK.png" width="300" alt="j3D Logo">
@@ -15,8 +15,9 @@
 6. [Rendering System](#rendering-system)
 7. [Input Handling](#input-handling)
 8. [Utility Classes](#utility-classes)
-9. [Best Practices](#best-practices)
-10. [Future Development](#future-development)
+9. [Character Controller](#character-controller)
+10. [Best Practices](#best-practices)
+11. [Future Development](#future-development)
 
 ## Introduction
 
@@ -29,6 +30,7 @@ This manual documents the refactored architecture of the engine, highlighting th
 - Scene-based rendering system
 - Entity management
 - First-person camera controls
+- Character controller with physics-based movement
 - Basic lighting system (ambient, diffuse, specular)
 - OBJ model loading
 - Texture management
@@ -130,6 +132,23 @@ Defines a light source with:
 - Color
 - Ambient light intensity
 
+### Player
+
+Represents a player character in the game world with:
+- Physics-based movement with inertia
+- First-person camera at eye level
+- Collision detection via a bounding capsule
+- Support for both physics-based and free camera modes
+
+**Key Methods:**
+- `update(deltaTime)`: Update player position based on physics and input
+- `setMovementInput(forwardMovement, sidewaysMovement)`: Set movement direction
+- `toggleFreeCamera()`: Switch between player-bound and free camera modes
+- `setPosition(x, y, z)`: Set absolute player position (feet position)
+- `getPosition()`: Get current player position
+- `getVelocity()`: Get player's current velocity vector
+- `getPlayerCamera()`: Get the camera position (eye level)
+
 ## Scene Management
 
 The scene system organizes entities for efficient management:
@@ -210,6 +229,66 @@ Helper methods for loading 3D models:
 - Load OBJ models with textures
 - Provide primitive shapes
 
+## Character Controller
+
+The j3D engine provides a character controller system for implementing player movement and interaction:
+
+### Player Controller
+
+The Player class serves as a character controller with the following features:
+
+#### Physics-Based Movement
+- Momentum and inertia simulation
+- Maximum velocity capping
+- Delta-time independent movement
+
+#### Camera Positioning
+- Eye-level camera positioning
+- First-person perspective
+- Smooth movement
+
+#### Free Camera Mode
+- Toggle between character-bound and free-floating camera
+- Camera position and rotation preservation when switching modes
+- Development-friendly camera controls
+
+#### Implementation Example
+
+```java
+// Create a player at position (0,0,0)
+Player player = new Player(new Vector3f(0, 0, 0));
+
+// Handle keyboard input for player movement
+public void handleInput() {
+    // Get movement input (-1, 0, or 1 for each axis)
+    float forwardInput = 0;
+    float sidewaysInput = 0;
+    
+    if (window.isKeyPressed(GLFW.GLFW_KEY_W)) forwardInput = 1;
+    if (window.isKeyPressed(GLFW.GLFW_KEY_S)) forwardInput = -1;
+    if (window.isKeyPressed(GLFW.GLFW_KEY_A)) sidewaysInput = -1;
+    if (window.isKeyPressed(GLFW.GLFW_KEY_D)) sidewaysInput = 1;
+    
+    // Apply input to player movement
+    player.setMovementInput(forwardInput, sidewaysInput);
+    
+    // Toggle free camera with F key
+    if (window.isKeyPressed(GLFW.GLFW_KEY_F)) {
+        player.toggleFreeCamera();
+    }
+}
+
+// Update player in game loop
+public void update(float deltaTime) {
+    player.update(deltaTime);
+}
+
+// In render method, use player's camera
+public void render() {
+    renderer.render(scene, player.getCamera());
+}
+```
+
 ## Best Practices
 
 When working with the j3D engine, follow these best practices:
@@ -234,6 +313,13 @@ When working with the j3D engine, follow these best practices:
 1. **Follow naming conventions**: Use the established naming patterns for consistency.
 2. **Document with JavaDoc**: Add JavaDoc comments to describe classes, methods, and parameters.
 
+### Player Implementation
+
+1. **Use the Player class for first-person games**: The Player class provides a complete character controller with physics-based movement.
+2. **Scale movement by delta time**: Use the provided update method with proper delta time to ensure consistent movement across different frame rates.
+3. **Use free camera mode for development**: Toggle free camera mode during development to easily navigate and debug scenes.
+4. **Customize physics parameters**: Modify player constants to adjust movement feel (inertia, maximum velocity, etc.)
+
 ## Future Development
 
 The j3D engine has several planned areas for future enhancement:
@@ -253,9 +339,10 @@ The j3D engine has several planned areas for future enhancement:
 
 ### Physics Integration
 
-- Collision detection
+- Enhanced collision detection
 - Rigid body physics
 - Constraint systems
+- Advanced character controllers
 
 ### Asset Management
 
@@ -271,4 +358,4 @@ The j3D engine has several planned areas for future enhancement:
 
 ---
 
-© 2025 DISCVRD Software | DiscardSoft
+© 2025 DiscardSoft
