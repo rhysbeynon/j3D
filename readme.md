@@ -4,7 +4,7 @@
 
 ## Overview
 
-j3D is a lightweight, Java-based 3D game engine built with LWJGL (Lightweight Java Game Library) and OpenGL. Developed by DISCVRD Software, j3D provides a simple yet powerful framework for creating 3D applications and games with modern rendering capabilities.
+j3D is a lightweight, Java-based 3D game engine built with LWJGL and OpenGL. Developed by DISCVRD Software, j3D provides a simple framework for creating 3D applications and games.
 
 ## Features
 
