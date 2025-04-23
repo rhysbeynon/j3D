@@ -5,7 +5,9 @@ import com.discardsoft.j3D.core.*;
 import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.entity.Player;
 import com.discardsoft.j3D.core.scene.TestScene;
+import com.discardsoft.j3D.core.utils.DebugHUD;
 import com.discardsoft.j3D.core.utils.Settings;
+import com.discardsoft.j3D.core.utils.Consts;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -27,6 +29,15 @@ public class TestGame implements IGameLogic {
     
     /** Toggle for wireframe rendering mode */
     private boolean wireframeMode = false;
+    
+    /** Toggle for debug HUD display */
+    private boolean showDebugHUD = false;
+    
+    /** Debug HUD for displaying game information */
+    private DebugHUD debugHUD;
+    
+    /** Current FPS for debug display */
+    private int currentFps;
 
     /** Speed multiplier for camera movement in free camera mode */
     private static final float CAMERA_MOVE_SPEED = Settings.CAMERA_MOVE_SPEED;
@@ -80,6 +91,9 @@ public class TestGame implements IGameLogic {
         
         // Add player's bounding entity to the scene
         scene.addEntity(player.getBoundingEntity());
+        
+        // Initialize debug HUD
+        debugHUD = new DebugHUD(window.getWidth(), window.getHeight());
         
         // Initialize time tracking for animations
         lastFrameTime = System.currentTimeMillis();
@@ -178,10 +192,16 @@ public class TestGame implements IGameLogic {
             }
         }
         
-        // Toggle free camera mode
+        // Toggle freecam
         if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_C)) {
             player.toggleFreeCamera();
             System.out.println("Free camera mode: " + player.isFreeCameraMode());
+        }
+        
+        // Toggle debug HUD with F3 key
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_F3)) {
+            showDebugHUD = !showDebugHUD;
+            System.out.println("Debug HUD: " + (showDebugHUD ? "ON" : "OFF"));
         }
     }
     
@@ -207,9 +227,9 @@ public class TestGame implements IGameLogic {
         if (player.isFreeCameraMode()) {
             Camera camera = player.getCamera();
             camera.movePosition(
-                cameraInc.x * CAMERA_MOVE_SPEED, 
-                cameraInc.y * CAMERA_MOVE_SPEED, 
-                cameraInc.z * CAMERA_MOVE_SPEED
+                cameraInc.x * CAMERA_MOVE_SPEED * deltaTime * 60.0f, 
+                cameraInc.y * CAMERA_MOVE_SPEED * deltaTime * 60.0f, 
+                cameraInc.z * CAMERA_MOVE_SPEED * deltaTime * 60.0f
             );
         }
 
@@ -225,6 +245,10 @@ public class TestGame implements IGameLogic {
             GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
             // Force update the projection matrix
             window.updateProjectionMatrix();
+            // Update debug HUD dimensions
+            if (debugHUD != null) {
+                debugHUD.updateScreenSize(window.getWidth(), window.getHeight());
+            }
             window.setResize(false);  // Reset the resize flag
         }
 
@@ -233,6 +257,14 @@ public class TestGame implements IGameLogic {
         
         // Render the scene using the player's camera
         renderer.render(scene, player.getCamera());
+        
+        // Update current FPS value from EngineManager
+        currentFps = (int) EngineManager.getFps();
+        
+        // Render debug HUD if enabled
+        if (showDebugHUD && debugHUD != null) {
+            debugHUD.render(currentFps, player, scene);
+        }
     }
 
     @Override

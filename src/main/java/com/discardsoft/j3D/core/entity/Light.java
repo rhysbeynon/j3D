@@ -77,7 +77,7 @@ public class Light {
     }
     
     /**
-     * Sets the light's position.
+     * Sets the lights position.
      *
      * @param x The X coordinate
      * @param y The Y coordinate 
@@ -88,7 +88,7 @@ public class Light {
     }
     
     /**
-     * Sets the light's position.
+     * Sets the lights position.
      *
      * @param position The new position vector
      */
@@ -97,7 +97,7 @@ public class Light {
     }
     
     /**
-     * Sets the light's color.
+     * Sets the lights color.
      * 
      * @param r Red component (0.0-1.0)
      * @param g Green component (0.0-1.0)
@@ -108,7 +108,7 @@ public class Light {
     }
     
     /**
-     * Sets the light's color.
+     * Sets the lights color.
      *
      * @param color The new color vector (RGB)
      */

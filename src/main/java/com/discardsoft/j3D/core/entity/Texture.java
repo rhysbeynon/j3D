@@ -9,6 +9,7 @@ package com.discardsoft.j3D.core.entity;
  * 
  * @author DISCVRD Software
  * @version 0.1
+ * @see Model
  */
 public class Texture {
 

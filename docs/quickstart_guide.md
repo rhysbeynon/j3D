@@ -127,7 +127,7 @@ import com.discardsoft.j3D.core.entity.*;
 import com.discardsoft.j3D.core.utils.LoadModel;
 import org.joml.Vector3f;
 
-public class MyScene extends TestScene {
+public class MyScene extends BaseScene {
     @Override
     public void initialize() {
         // Add a cube

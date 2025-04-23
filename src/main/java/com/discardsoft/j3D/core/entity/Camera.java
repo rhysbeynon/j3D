@@ -72,7 +72,7 @@ public class Camera {
     }
 
     /**
-     * Sets the camera's absolute position.
+     * Sets the cameras absolute position.
      *
      * @param x X-coordinate
      * @param y Y-coordinate
@@ -85,7 +85,7 @@ public class Camera {
     }
 
     /**
-     * Sets the camera's position using a vector.
+     * Sets the cameras position using a vector.
      *
      * @param position The new position vector
      */
@@ -94,7 +94,7 @@ public class Camera {
     }
 
     /**
-     * Sets the camera's absolute rotation.
+     * Sets the cameras absolute rotation.
      *
      * @param pitch Rotation around X-axis (up/down)
      * @param yaw Rotation around Y-axis (left/right)
@@ -107,7 +107,7 @@ public class Camera {
     }
 
     /**
-     * Sets the camera's rotation using a vector.
+     * Sets the cameras rotation using a vector.
      *
      * @param rotation The new rotation vector in degrees
      */
