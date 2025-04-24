@@ -31,14 +31,29 @@ public class Player {
     /** Base Y offset to position the player correctly */
     private static final float BASE_Y_OFFSET = 0.9f;
     
-    /** Player movement speed */
-    private static final float MOVEMENT_SPEED = 0.03f;
+    /** Player movement speed (reduced for slower movement) */
+    private static final float MOVEMENT_SPEED = 0.4f;
     
     /** Maximum velocity of the player */
-    private static final float MAX_VELOCITY = 0.1f;
+    private static final float MAX_VELOCITY = 99.9f;
     
     /** Inertia factor (0 = no inertia, 1 = maximum inertia) */
     private static final float INERTIA_FACTOR = 0.85f;
+    
+    /** 
+     * Gravity acceleration constant in game units per second squared
+     * Based on Earth's gravity but scaled for game feel
+     */
+    private static final float GRAVITY = 15.0f;  // units per second squared
+    
+    /** 
+     * Jump initial velocity (reduced for lower jumps)
+     * Measured in game units per second
+     */
+    private static final float JUMP_POWER = 4.0f;
+    
+    /** Ground level y-coordinate */
+    private static final float GROUND_LEVEL = 0.0f;
     
     /** Current velocity vector */
     private final Vector3f velocity;
@@ -48,6 +63,9 @@ public class Player {
     
     /** Flag for free camera mode */
     private boolean freeCameraMode;
+    
+    /** Flag to track if player is on the ground */
+    private boolean isGrounded;
     
     /** Camera position before free camera mode was activated */
     private final Vector3f storedCameraPosition;
@@ -81,6 +99,7 @@ public class Player {
         this.velocity = new Vector3f(0, 0, 0);
         this.movementInput = new Vector3f(0, 0, 0);
         this.freeCameraMode = false;
+        this.isGrounded = true;
         this.storedCameraPosition = new Vector3f();
         this.storedCameraRotation = new Vector3f();
     }
@@ -94,21 +113,57 @@ public class Player {
      * @param deltaTime Time elapsed since last update in seconds
      */
     public void update(float deltaTime) {
+        // Apply horizontal movement only when not in free camera mode
         if (!freeCameraMode) {
-            // Apply movement input to velocity with inertia
-            velocity.x = velocity.x * INERTIA_FACTOR + movementInput.x * MOVEMENT_SPEED;
-            velocity.z = velocity.z * INERTIA_FACTOR + movementInput.z * MOVEMENT_SPEED;
+            // Apply movement input to velocity with inertia - frame rate independent
+            float frameInertia = (float) Math.pow(INERTIA_FACTOR, deltaTime * 60); // Scale inertia to frame time
             
-            // Limit maximum velocity
-            if (velocity.lengthSquared() > MAX_VELOCITY * MAX_VELOCITY) {
-                velocity.normalize().mul(MAX_VELOCITY);
+            // Apply horizontal movement
+            velocity.x = velocity.x * frameInertia + movementInput.x * MOVEMENT_SPEED;
+            velocity.z = velocity.z * frameInertia + movementInput.z * MOVEMENT_SPEED;
+            
+            // Limit maximum horizontal velocity
+            float horizSpeedSquared = velocity.x * velocity.x + velocity.z * velocity.z;
+            if (horizSpeedSquared > MAX_VELOCITY * MAX_VELOCITY) {
+                float scale = MAX_VELOCITY / (float) Math.sqrt(horizSpeedSquared);
+                velocity.x *= scale;
+                velocity.z *= scale;
             }
-            
-            // Move the bounding entity based on velocity
-            Vector3f movementVec = new Vector3f(velocity).mul(deltaTime * 60); // Normalize for 60 fps
-            boundingEntity.incrementPosition(movementVec.x, 0, movementVec.z);
-            
-            // Update camera position to match player
+        }
+        
+        // Always apply gravity and vertical physics, even in free camera mode
+        // Apply gravity when not on ground
+        if (!isGrounded) {
+            velocity.y -= GRAVITY * deltaTime; // Scale with delta time
+        }
+        
+        // Move the bounding entity based on velocity (even in free camera mode)
+        Vector3f movementVec = new Vector3f(velocity).mul(deltaTime); // Scale with delta time
+        
+        // In free camera mode, only apply vertical movement to the player entity
+        if (freeCameraMode) {
+            boundingEntity.incrementPosition(0, movementVec.y, 0);
+        } else {
+            boundingEntity.incrementPosition(movementVec.x, movementVec.y, movementVec.z);
+        }
+        
+        // Check if player is on the ground
+        // Use the bottom of the player capsule for collision detection
+        Vector3f playerPos = boundingEntity.getPosition();
+        float playerBottom = playerPos.y - BASE_Y_OFFSET;
+        
+        if (playerBottom <= GROUND_LEVEL) {
+            // Collided with ground, reset position and vertical velocity
+            isGrounded = true;
+            velocity.y = 0;
+            boundingEntity.setPosition(playerPos.x, GROUND_LEVEL + BASE_Y_OFFSET, playerPos.z);
+        } else {
+            // Not touching ground
+            isGrounded = false;
+        }
+        
+        // Update camera position to match player
+        if (!freeCameraMode) {
             updateCameraPosition();
         }
         
@@ -263,5 +318,25 @@ public class Player {
      */
     public Vector3f getPlayerCamera() {
         return camera.getPosition();
+    }
+    
+    /**
+     * Makes the player jump if they are currently on the ground.
+     * Does nothing if the player is already in the air.
+     */
+    public void jump() {
+        if (isGrounded && !freeCameraMode) {
+            velocity.y = JUMP_POWER;
+            isGrounded = false;
+        }
+    }
+    
+    /**
+     * Checks if the player is currently on the ground.
+     * 
+     * @return True if the player is on the ground, false if airborne
+     */
+    public boolean isGrounded() {
+        return isGrounded;
     }
 }

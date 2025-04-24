@@ -57,4 +57,42 @@ public class TextRenderer {
         this.screenWidth = width;
         this.screenHeight = height;
     }
+    
+    /**
+     * Gets the screen width.
+     *
+     * @return The current screen width in pixels
+     */
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+    
+    /**
+     * Gets the screen height.
+     *
+     * @return The current screen height in pixels
+     */
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+    
+    /**
+     * Renders text with a background rectangle.
+     * 
+     * @param text The text to render
+     * @param x The x position in pixels
+     * @param y The y position in pixels
+     * @param textColor The color of the text
+     * @param backgroundColor The color of the background (with alpha)
+     */
+    public void renderTextWithBackground(String text, int x, int y, float[] textColor, float[] backgroundColor) {
+        if (text == null || text.isEmpty()) {
+            return;
+        }
+        
+        // Output pause message to console instead of rendering on screen
+        System.out.println("====== PAUSE OVERLAY ======");
+        System.out.println(text);
+        System.out.println("==========================");
+    }
 }

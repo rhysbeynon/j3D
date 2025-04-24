@@ -73,6 +73,9 @@ public class TestGame implements IGameLogic {
     /** Vector for camera movement increments (used in free camera mode) */
     private final Vector3f cameraInc;
     
+    /** Flag to track if the game is paused */
+    private boolean gamePaused;
+    
     /** Time tracking for animation and physics */
     private float deltaTime;
     private long lastFrameTime;
@@ -117,12 +120,18 @@ public class TestGame implements IGameLogic {
         // Check for cursor control toggles first
         if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_ESCAPE)) {
             window.releaseCursor();
+            gamePaused = true;  // Pause game when escape is pressed
+            System.out.println("Game paused");
         } else if (window.isWaitingForClick() && window.isMouseButtonClicked()) {
             window.captureCursor();
+            gamePaused = false;  // Resume game when cursor is captured
+            System.out.println("Game resumed");
+            // Reset the time tracking to prevent large delta time after resuming
+            lastFrameTime = System.currentTimeMillis();
         }
         
-        // Skip movement input if cursor is not captured
-        if (!window.isCursorCaptured()) {
+        // Skip movement input if cursor is not captured or game is paused
+        if (!window.isCursorCaptured() || gamePaused) {
             return;
         }
         
@@ -184,6 +193,11 @@ public class TestGame implements IGameLogic {
             }
             if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
                 cameraInc.y = -1.0f;
+            }
+        } else {
+            // Jump when space is pressed and player is on the ground
+            if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_SPACE)) {
+                player.jump();
             }
         }
         
@@ -260,6 +274,11 @@ public class TestGame implements IGameLogic {
         deltaTime = (currentTime - lastFrameTime) / 1000.0f;
         lastFrameTime = currentTime;
         
+        // Skip updates if the game is paused
+        if (gamePaused) {
+            return;
+        }
+        
         // Update the player
         player.update(deltaTime);
         
@@ -304,6 +323,16 @@ public class TestGame implements IGameLogic {
         // Render debug HUD if enabled
         if (showDebugHUD && debugHUD != null) {
             debugHUD.render(currentFps, player, scene, player.isFreeCameraMode() ? currentCameraMoveSpeed : DEFAULT_CAMERA_MOVE_SPEED);
+        }
+        
+        // Display a pause message when game is paused
+        if (gamePaused) {
+            // Draw "PAUSED" text in the center of the screen
+            // Note: This requires a text rendering system
+            // For now, we'll use the debug HUD if available
+            if (debugHUD != null) {
+                debugHUD.renderPauseOverlay();
+            }
         }
     }
 

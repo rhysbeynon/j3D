@@ -95,4 +95,29 @@ public class DebugHUD {
     public void updateScreenSize(int width, int height) {
         textRenderer.updateScreenSize(width, height);
     }
+    
+    /**
+     * Renders a pause overlay in the center of the screen.
+     * This is displayed when the game is paused.
+     */
+    public void renderPauseOverlay() {
+        // Get the screen dimensions from the text renderer
+        int screenWidth = textRenderer.getScreenWidth();
+        int screenHeight = textRenderer.getScreenHeight();
+        
+        // Create the pause message
+        String pauseMessage = "GAME PAUSED\nClick to resume";
+        
+        // Calculate text position for center of the screen
+        // Estimate text width (this is a rough approximation)
+        int textWidth = pauseMessage.indexOf('\n') * 10;  // Approximate character width
+        int textHeight = 50;  // Approximate height for two lines
+        
+        int x = (screenWidth - textWidth) / 2;
+        int y = (screenHeight - textHeight) / 2;
+        
+        // Use a semi-transparent background
+        float[] backgroundColor = {0.0f, 0.0f, 0.0f, 0.7f};  // Black with 70% opacity
+        textRenderer.renderTextWithBackground(pauseMessage, x, y, TEXT_COLOR, backgroundColor);
+    }
 }
