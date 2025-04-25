@@ -6,7 +6,7 @@
 // -|              Window Manager class for j3D               |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.05a In Development             |-
+// -|               Version: 0.06a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
@@ -24,6 +24,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.glViewport;
 
@@ -62,6 +65,13 @@ public class WindowManager {
     // Track scroll wheel movement
     private double scrollOffset = 0.0;
     private boolean hasScrolled = false;
+    
+    // Window focus state
+    private boolean windowFocused = true;
+    
+    // Event listeners
+    private final List<Consumer<Boolean>> cursorCaptureListeners = new ArrayList<>();
+    private final List<Consumer<Boolean>> windowFocusListeners = new ArrayList<>();
 
     public WindowManager(String title, int width, int height) {
         this.title = title;
@@ -92,12 +102,9 @@ public class WindowManager {
         // Get the primary monitor's resolution
         GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
         
-        // If resize is false and not already maximized, use the monitor's resolution
-        if (!resize && width != 0 && height != 0) {
-            width = vidMode.width() - 32;
-            height = vidMode.width() * 9 / 16;
-        }
-
+        // NOTE: Removed the code that was overriding the user-specified resolution
+        // Now the resolution set in Main.java will be used directly
+        
         /*
         GLFW requires window "hints" to create a window.
         These set things like: Is window resizable?, is Vsync used?, etc.
@@ -179,6 +186,19 @@ public class WindowManager {
             if(key == GLFW.GLFW_KEY_BACKSLASH && action == GLFW.GLFW_PRESS) {
                 GLFW.glfwSetWindowShouldClose(window, true);
             }
+        });
+        
+        // Set up window focus callback - automatically pause/resume based on focus
+        GLFW.glfwSetWindowFocusCallback(window, (window, focused) -> {
+            windowFocused = focused;
+            if (!focused) {
+                // Only release cursor if we're not already in an unfocused state
+                if (cursorCaptured) {
+                    releaseCursor();
+                }
+            }
+            // Notify all window focus listeners
+            notifyWindowFocusListeners(focused);
         });
 
         /*
@@ -378,6 +398,9 @@ public class WindowManager {
             waitingForClick = true;
             // Reset first mouse to avoid camera jump when recapturing
             firstMouse = true;
+            
+            // Notify all cursor capture listeners
+            notifyCursorCaptureListeners(false);
         }
     }
 
@@ -386,12 +409,15 @@ public class WindowManager {
      * Hides the cursor and constrains it to the window for camera movement.
      */
     public void captureCursor() {
-        if (!cursorCaptured) {
+        if (!cursorCaptured && windowFocused) {
             GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
             cursorCaptured = true;
             waitingForClick = false;
             // Reset first mouse to avoid camera jump
             firstMouse = true;
+            
+            // Notify all cursor capture listeners
+            notifyCursorCaptureListeners(true);
         }
     }
     
@@ -455,5 +481,54 @@ public class WindowManager {
         boolean result = hasScrolled;
         hasScrolled = false;
         return result;
+    }
+    
+    /**
+     * Checks if the window currently has focus.
+     * 
+     * @return true if window is focused, false otherwise
+     */
+    public boolean isWindowFocused() {
+        return windowFocused;
+    }
+    
+    /**
+     * Add a listener for cursor capture events.
+     * 
+     * @param listener Consumer that takes a boolean indicating if cursor is captured
+     */
+    public void addCursorCaptureListener(Consumer<Boolean> listener) {
+        cursorCaptureListeners.add(listener);
+    }
+    
+    /**
+     * Add a listener for window focus events.
+     * 
+     * @param listener Consumer that takes a boolean indicating if window is focused
+     */
+    public void addWindowFocusListener(Consumer<Boolean> listener) {
+        windowFocusListeners.add(listener);
+    }
+    
+    /**
+     * Notifies all cursor capture listeners of a change in cursor capture state.
+     * 
+     * @param captured true if cursor is captured, false otherwise
+     */
+    private void notifyCursorCaptureListeners(boolean captured) {
+        for (Consumer<Boolean> listener : cursorCaptureListeners) {
+            listener.accept(captured);
+        }
+    }
+    
+    /**
+     * Notifies all window focus listeners of a change in window focus state.
+     * 
+     * @param focused true if window is focused, false otherwise
+     */
+    private void notifyWindowFocusListeners(boolean focused) {
+        for (Consumer<Boolean> listener : windowFocusListeners) {
+            listener.accept(focused);
+        }
     }
 }

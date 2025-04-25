@@ -3,10 +3,10 @@
 // -|        j3D is a lightweight custom-built engine         |-
 // -|        Made with LWJGL, openGL, JOML, and other         |-
 // -|        helpful libraries for use on DiscardSoft         |-
-// -|              Object Loader class for j3D                |-
+// -|            Object and Resource Loader for j3D           |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.05a In Development             |-
+// -|               Version: 0.06a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 

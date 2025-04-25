@@ -12,7 +12,7 @@ import org.joml.Vector3f;
  * </p>
  *
  * @author DiscardSoft
- * @version 0.1
+ * @version 0.3
  */
 public class Player {
     
@@ -28,16 +28,23 @@ public class Player {
     /** Eye height relative to the bottom of the player */
     private static final float EYE_HEIGHT = 0.8f * PLAYER_HEIGHT;
     
-    /** Base Y offset to position the player correctly */
-    private static final float BASE_Y_OFFSET = 0.9f;
+    /** Base Y offset to position the player correctly 
+     * @implSpec This is used to adjust the player's feet position
+     * @implNote The base offset is half the player's height to center the player
+     * vertically in the world
+    */
+    private static final float BASE_Y_OFFSET = (PLAYER_HEIGHT / 2);
     
     /** Player movement speed (reduced for slower movement) */
     private static final float MOVEMENT_SPEED = 0.4f;
     
     /** Maximum velocity of the player */
-    private static final float MAX_VELOCITY = 99.9f;
+    private static final float MAX_VELOCITY = 999.9f;
     
-    /** Inertia factor (0 = no inertia, 1 = maximum inertia) */
+    /** Inertia factor (0 = no inertia, 1 = maximum inertia) 
+     * @implSpec 0.85f is a realistic earth-like friction factor
+     * @implNote This value is used to calculate the inertia effect on the player
+    */
     private static final float INERTIA_FACTOR = 0.85f;
     
     /** 
@@ -50,7 +57,7 @@ public class Player {
      * Jump initial velocity (reduced for lower jumps)
      * Measured in game units per second
      */
-    private static final float JUMP_POWER = 4.0f;
+    private static final float JUMP_POWER = 5.0f;
     
     /** Ground level y-coordinate */
     private static final float GROUND_LEVEL = 0.0f;
@@ -116,7 +123,7 @@ public class Player {
         // Apply horizontal movement only when not in free camera mode
         if (!freeCameraMode) {
             // Apply movement input to velocity with inertia - frame rate independent
-            float frameInertia = (float) Math.pow(INERTIA_FACTOR, deltaTime * 60); // Scale inertia to frame time
+            float frameInertia = (float) Math.pow(INERTIA_FACTOR, deltaTime * 90); // Scale inertia to frame time
             
             // Apply horizontal movement
             velocity.x = velocity.x * frameInertia + movementInput.x * MOVEMENT_SPEED;

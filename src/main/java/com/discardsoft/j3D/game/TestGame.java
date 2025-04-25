@@ -32,7 +32,7 @@ public class TestGame implements IGameLogic {
     private boolean wireframeMode = false;
     
     /** Toggle for debug HUD display */
-    private boolean showDebugHUD = false;
+    private boolean showDebugHUD = DEV_MODE; // Now enabled by default in dev mode
     
     /** Debug HUD for displaying game information */
     private DebugHUD debugHUD;
@@ -113,21 +113,19 @@ public class TestGame implements IGameLogic {
         
         // Initialize time tracking for animations
         lastFrameTime = System.currentTimeMillis();
+        
+        // Register window focus listener to automatically pause the game
+        window.addWindowFocusListener(this::handleWindowFocus);
+        
+        // Register cursor capture listener to automatically pause/unpause the game
+        window.addCursorCaptureListener(this::handleCursorCapture);
     }
 
     @Override
     public void input() {
-        // Check for cursor control toggles first
+        // Check for pause toggle with ESC key
         if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_ESCAPE)) {
-            window.releaseCursor();
-            gamePaused = true;  // Pause game when escape is pressed
-            System.out.println("Game paused");
-        } else if (window.isWaitingForClick() && window.isMouseButtonClicked()) {
-            window.captureCursor();
-            gamePaused = false;  // Resume game when cursor is captured
-            System.out.println("Game resumed");
-            // Reset the time tracking to prevent large delta time after resuming
-            lastFrameTime = System.currentTimeMillis();
+            togglePause();
         }
         
         // Skip movement input if cursor is not captured or game is paused
@@ -208,6 +206,79 @@ public class TestGame implements IGameLogic {
         
         // Camera rotation from mouse input (always active for look controls)
         handleCameraRotation();
+    }
+    
+    /**
+     * Handles window focus changes.
+     * Pauses the game when window loses focus.
+     * 
+     * @param focused true if window gained focus, false if it lost focus
+     */
+    private void handleWindowFocus(boolean focused) {
+        if (!focused) {
+            pauseGame();
+            System.out.println("Game paused: Window lost focus");
+        }
+    }
+    
+    /**
+     * Handles cursor capture changes.
+     * Links cursor state to game pause state.
+     * 
+     * @param captured true if cursor is captured, false if it's released
+     */
+    private void handleCursorCapture(boolean captured) {
+        if (captured) {
+            resumeGame();
+        } else {
+            pauseGame();
+        }
+    }
+    
+    /**
+     * Toggles the pause state of the game.
+     * If paused, it will resume; if running, it will pause.
+     */
+    private void togglePause() {
+        if (gamePaused) {
+            resumeGame();
+        } else {
+            pauseGame();
+        }
+    }
+    
+    /**
+     * Pauses the game and releases the cursor.
+     */
+    private void pauseGame() {
+        gamePaused = true;
+        window.releaseCursor();
+        System.out.println("PAUSE");
+    }
+    
+    /**
+     * Resumes the game and captures the cursor.
+     * This method can be called from a GUI "Resume" button.
+     */
+    public void resumeGame() {
+        // Only try to resume if the window is focused
+        if (window.isWindowFocused()) {
+            window.captureCursor();
+            gamePaused = false;
+            
+            // Reset the time tracking to prevent large delta time after resuming
+            lastFrameTime = System.currentTimeMillis();
+            System.out.println("RESUME");
+        }
+    }
+    
+    /**
+     * Checks if the game is currently paused.
+     * 
+     * @return true if game is paused, false if game is running
+     */
+    public boolean isGamePaused() {
+        return gamePaused;
     }
     
     /**
@@ -328,8 +399,7 @@ public class TestGame implements IGameLogic {
         // Display a pause message when game is paused
         if (gamePaused) {
             // Draw "PAUSED" text in the center of the screen
-            // Note: This requires a text rendering system
-            // For now, we'll use the debug HUD if available
+            // In the future, this will render a proper pause menu with a resume button
             if (debugHUD != null) {
                 debugHUD.renderPauseOverlay();
             }

@@ -21,7 +21,7 @@
 // -|           Main class and entrypoint for j3D             |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.05a In Development             |-
+// -|               Version: 0.06a In Development             |-
 // -|                                                         |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
@@ -43,7 +43,7 @@ import org.lwjgl.Version;
  * </p>
  * 
  * @author DiscardSoft
- * @version 0.1
+ * @version 0.4
  */
 public class Main {
 

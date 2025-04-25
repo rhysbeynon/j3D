@@ -8,7 +8,7 @@ package com.discardsoft.j3D.core.utils;
  * </p>
  * 
  * @author DiscardSoft
- * @version 0.1
+ * @version 0.2
  */
 public final class Consts {
     
@@ -22,7 +22,7 @@ public final class Consts {
     //---------- Version and Branding ----------//
     
     /** Engine version string displayed in window title and logs */
-    public static final String VERSION = "v0.05a";
+    public static final String VERSION = "v0.06a";
     
     /** Author/company name */
     public static final String AUTHOR = "DiscardSoft";

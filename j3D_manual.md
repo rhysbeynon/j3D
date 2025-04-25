@@ -1,5 +1,5 @@
 # j3D Engine Manual
-**Version 0.05a | April 23, 2025**
+**Version 0.06a | April 23, 2025**
 
 <div align="center">
   <img src="src/main/resources/j3D_DARK.png" width="300" alt="j3D Logo">
