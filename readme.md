@@ -24,18 +24,6 @@ j3D is a lightweight, Java-based 3D game engine built with LWJGL and OpenGL. Dev
 - Graphics card with OpenGL support
 - Gradle build system
 
-## Quick Start
-
-1. Clone the repository
-2. Build the project with Gradle:
-   ```
-   ./gradlew build
-   ```
-3. Run the application:
-   ```
-   ./gradlew run
-   ```
-
 ## Project Structure
 
 - `src/main/java/com/discardsoft/j3D/` - Core engine and game logic
