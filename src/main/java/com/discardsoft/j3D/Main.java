@@ -21,7 +21,7 @@
 // -|           Main class and entrypoint for j3D             |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.06a In Development             |-
+// -|               Version: 0.07a In Development             |-
 // -|                                                         |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
@@ -30,6 +30,7 @@ package com.discardsoft.j3D;
 
 import com.discardsoft.j3D.core.EngineManager;
 import com.discardsoft.j3D.core.WindowManager;
+import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.utils.Consts;
 import com.discardsoft.j3D.game.TestGame;
 import org.lwjgl.Version;
@@ -95,5 +96,22 @@ public class Main {
      */
     public static TestGame getGame() {
         return game;
+    }
+    
+    /**
+     * Gets the current active camera used for rendering.
+     * <p>
+     * This method provides access to the current player's camera,
+     * which is needed for implementing billboard effects that face
+     * the camera.
+     * </p>
+     *
+     * @return The current camera instance, or null if the game or player isn't initialized
+     */
+    public static Camera getCurrentCamera() {
+        if (game != null && game.getPlayer() != null) {
+            return game.getPlayer().getCamera();
+        }
+        return null;
     }
 }

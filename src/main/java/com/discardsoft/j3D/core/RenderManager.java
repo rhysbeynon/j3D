@@ -6,7 +6,7 @@
 // -|              Render Manager class for j3D               |-
 // -|    Comments are always written above relevant context.  |-
 // -|   ++++++++++++++++++++++++++++++++++++++++++++++++++    |-
-// -|               Version: 0.06a In Development             |-
+// -|               Version: 0.07a In Development             |-
 // -|   *some comments may be written by AI for convenience   |-
 // -|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++|-
 
@@ -19,11 +19,14 @@ import com.discardsoft.j3D.core.entity.Light;
 import com.discardsoft.j3D.core.scene.TestScene;
 import com.discardsoft.j3D.core.utils.Transformation;
 import com.discardsoft.j3D.core.utils.Utils;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -81,6 +84,9 @@ public class RenderManager {
         shader.createUniform("lightColor");
         shader.createUniform("ambientLight");
         shader.createUniform("cameraPosition");
+        
+        // Add a new uniform for transparency flag
+        shader.createUniform("useTransparency");
     }
 
     /**
@@ -99,6 +105,18 @@ public class RenderManager {
         List<Entity> entities = scene.getEntities();
         Light light = scene.getLight();
 
+        // Separate entities into opaque and transparent lists
+        List<Entity> opaqueEntities = new ArrayList<>();
+        List<Entity> transparentEntities = new ArrayList<>();
+        
+        for (Entity entity : entities) {
+            if (entity.hasTransparentTexture()) {
+                transparentEntities.add(entity);
+            } else {
+                opaqueEntities.add(entity);
+            }
+        }
+
         // Prepare shader program
         shader.bind();
         
@@ -114,14 +132,79 @@ public class RenderManager {
         
         // Set texture sampler uniform (always texture unit 0)
         shader.setUniform("textureSampler", 0);
-
-        // Render each entity in the scene
-        for (Entity entity : entities) {
+        
+        // First render all opaque objects with depth testing and writing enabled
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(true);
+        GL11.glDisable(GL11.GL_BLEND);
+        
+        // Set transparency flag to false for opaque objects
+        shader.setUniform("useTransparency", 0);
+        
+        // Render each opaque entity
+        for (Entity entity : opaqueEntities) {
             renderEntity(entity);
+        }
+        
+        // Then render transparent objects with blending enabled
+        if (!transparentEntities.isEmpty()) {
+            // Sort transparent entities by distance from camera (back to front)
+            sortTransparentEntities(transparentEntities, camera.getPosition());
+            
+            // Enable alpha blending
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glDepthMask(false);  // Don't write to depth buffer for transparent objects
+            
+            // Set transparency flag to true for transparent objects
+            shader.setUniform("useTransparency", 1);
+            
+            // Render each transparent entity
+            for (Entity entity : transparentEntities) {
+                renderEntity(entity);
+            }
+            
+            // Restore default state
+            GL11.glDepthMask(true);
+            GL11.glDisable(GL11.GL_BLEND);
         }
         
         // Unbind shader after rendering all entities
         shader.unbind();
+    }
+    
+    /**
+     * Sorts transparent entities by distance from camera, farthest to nearest.
+     * This ensures proper alpha blending by rendering distant objects first.
+     *
+     * @param transparentEntities List of entities with transparency
+     * @param cameraPosition Camera position to calculate distance from
+     */
+    private void sortTransparentEntities(List<Entity> transparentEntities, Vector3f cameraPosition) {
+        transparentEntities.sort(new Comparator<Entity>() {
+            @Override
+            public int compare(Entity e1, Entity e2) {
+                float distance1 = calculateDistanceSquared(e1.getPosition(), cameraPosition);
+                float distance2 = calculateDistanceSquared(e2.getPosition(), cameraPosition);
+                // Sort in descending order (furthest first)
+                return Float.compare(distance2, distance1);
+            }
+        });
+    }
+    
+    /**
+     * Calculates squared distance between two points.
+     * Using squared distance avoids unnecessary square root operations.
+     *
+     * @param pos1 First position
+     * @param pos2 Second position
+     * @return Square of the Euclidean distance between positions
+     */
+    private float calculateDistanceSquared(Vector3f pos1, Vector3f pos2) {
+        float dx = pos1.x - pos2.x;
+        float dy = pos1.y - pos2.y;
+        float dz = pos1.z - pos2.z;
+        return dx * dx + dy * dy + dz * dz;
     }
 
     /**
@@ -188,9 +271,25 @@ public class RenderManager {
         shader.setUniform("lightColor", light.getColor());
         shader.setUniform("ambientLight", light.getAmbient());
         shader.setUniform("cameraPosition", camera.getPosition());
+        
+        // Set transparency flag based on entity
+        shader.setUniform("useTransparency", entity.hasTransparentTexture() ? 1 : 0);
+
+        // Enable alpha blending if needed
+        if (entity.hasTransparentTexture()) {
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glDepthMask(false);
+        }
 
         // Render the entity
         renderEntity(entity);
+        
+        // Restore default state
+        if (entity.hasTransparentTexture()) {
+            GL11.glDepthMask(true);
+            GL11.glDisable(GL11.GL_BLEND);
+        }
         
         shader.unbind();
     }

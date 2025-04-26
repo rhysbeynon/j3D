@@ -1,5 +1,5 @@
 # j3D Engine Manual
-**Version 0.06a | April 23, 2025**
+**Version 0.07a | April 26, 2025**
 
 <div align="center">
   <img src="src/main/resources/j3D_DARK.png" width="300" alt="j3D Logo">
@@ -11,6 +11,7 @@
 2. [Engine Architecture](#engine-architecture)
 3. [Core Components](#core-components)
 4. [Entity System](#entity-system)
+   - [Billboarding System](#billboarding-system)
 5. [Scene Management](#scene-management)
 6. [Rendering System](#rendering-system)
 7. [Input Handling](#input-handling)
@@ -100,12 +101,60 @@ Represents a renderable object in 3D space with:
 - Rotation
 - Scale
 - 3D Model reference
+- Billboard flags (Y-axis and Full)
 
 **Key Methods:**
 - `incrementPosition(x, y, z)`: Move the entity
 - `incrementRotation(x, y, z)`: Rotate the entity
 - `setPosition(x, y, z)`: Set absolute position
 - `setRotation(x, y, z)`: Set absolute rotation
+- `setBillboardY(boolean)`: Enable Y-axis (horizontal) billboarding
+- `setBillboardFull(boolean)`: Enable full billboarding
+- `setHasTransparentTexture(boolean)`: Set transparency flag for proper rendering
+
+### Billboarding System
+
+The billboarding system allows entities to automatically orient themselves toward the camera, which is useful for vegetation, particles, and other 2D elements in a 3D world.
+
+#### Types of Billboarding
+
+j3D supports two types of billboarding:
+
+1. **Y-axis Billboarding**: The entity rotates only around the Y-axis to face the camera, maintaining its vertical orientation. This is ideal for trees, grass, and other objects that should remain upright.
+
+2. **Full Billboarding**: The entity completely faces the camera from all angles. This is suitable for particles, icons, and other elements that should always be fully visible to the player.
+
+#### Using Billboarding
+
+To create billboarded entities:
+
+```java
+// Create a standard entity first
+Entity entity = new Entity(
+    model,
+    new Vector3f(x, y, z),  // position
+    new Vector3f(0, 0, 0),  // rotation (will be managed by billboarding)
+    new Vector3f(1, 1, 1)   // scale
+);
+
+// For Y-axis billboarding (horizontal rotation only)
+entity.setBillboardY(true);
+
+// Or for full billboarding (always facing camera)
+entity.setBillboardFull(true);
+
+// Most billboarded entities have transparent textures
+entity.setHasTransparentTexture(true);
+```
+
+#### Implementation Details
+
+The billboarding system automatically calculates the correct orientation based on the camera's position:
+
+- Y-axis billboarding calculates the angle between the entity and camera in the XZ plane
+- Full billboarding creates a complete look-at matrix so the entity always faces the camera
+
+Billboarded entities are automatically rendered with proper transparency if the `hasTransparentTexture` flag is set.
 
 ### Model
 

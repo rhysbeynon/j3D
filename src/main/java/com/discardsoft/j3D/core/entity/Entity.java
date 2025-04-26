@@ -25,134 +25,55 @@ public class Entity {
     
     /** The scale of this entity on each axis */
     private final Vector3f scale;
+    
+    /** Flag indicating if this entity has transparency */
+    private boolean hasTransparentTexture;
+    
+    /** Flag for horizontal (Y-axis only) billboarding */
+    private boolean billboardY;
+    
+    /** Flag for full billboarding (faces camera completely) */
+    private boolean billboardFull;
 
     /**
-     * Constructs a new entity with the specified properties.
+     * Constructs a new entity with the specified model and transform parameters.
      *
-     * @param model The 3D model to render for this entity
-     * @param position The initial position in 3D space
-     * @param rotation The initial rotation in degrees
-     * @param scale The initial scale factors
+     * @param model The 3D model for this entity
+     * @param position The initial position vector
+     * @param rotation The initial rotation vector (in degrees)
+     * @param scale The initial scale vector
      */
     public Entity(Model model, Vector3f position, Vector3f rotation, Vector3f scale) {
         this.model = model;
-        this.position = position;
-        this.rotation = rotation;
-        this.scale = scale;
+        this.position = new Vector3f(position);
+        this.rotation = new Vector3f(rotation);
+        this.scale = new Vector3f(scale);
+        this.hasTransparentTexture = model.hasTransparentTexture();
+        this.billboardY = false;
+        this.billboardFull = false;
     }
 
     /**
-     * Increments the entity's position.
+     * Gets the model used by this entity.
      *
-     * @param x The amount to move along the X axis
-     * @param y The amount to move along the Y axis
-     * @param z The amount to move along the Z axis
-     */
-    public void incrementPosition(float x, float y, float z) {
-        this.position.x += x;
-        this.position.y += y;
-        this.position.z += z;
-    }
-
-    /**
-     * Sets the entity's position.
-     *
-     * @param x The new X coordinate
-     * @param y The new Y coordinate
-     * @param z The new Z coordinate
-     */
-    public void setPosition(float x, float y, float z) {
-        this.position.x = x;
-        this.position.y = y;
-        this.position.z = z;
-    }
-    
-    /**
-     * Sets the entity's position.
-     *
-     * @param position The new position vector
-     */
-    public void setPosition(Vector3f position) {
-        this.position.set(position);
-    }
-
-    /**
-     * Increments the entity's rotation.
-     *
-     * @param x The rotation degrees to add around the X axis
-     * @param y The rotation degrees to add around the Y axis
-     * @param z The rotation degrees to add around the Z axis
-     */
-    public void incrementRotation(float x, float y, float z) {
-        this.rotation.x += x;
-        this.rotation.y += y;
-        this.rotation.z += z;
-    }
-
-    /**
-     * Sets the entity's rotation.
-     *
-     * @param x The rotation in degrees around the X axis
-     * @param y The rotation in degrees around the Y axis
-     * @param z The rotation in degrees around the Z axis
-     */
-    public void setRotation(float x, float y, float z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
-    }
-    
-    /**
-     * Sets the entity's rotation.
-     *
-     * @param rotation The new rotation vector in degrees
-     */
-    public void setRotation(Vector3f rotation) {
-        this.rotation.set(rotation);
-    }
-    
-    /**
-     * Sets the entity's scale.
-     *
-     * @param x The scale factor along the X axis
-     * @param y The scale factor along the Y axis
-     * @param z The scale factor along the Z axis
-     */
-    public void setScale(float x, float y, float z) {
-        this.scale.x = x;
-        this.scale.y = y;
-        this.scale.z = z;
-    }
-    
-    /**
-     * Sets the entity's scale.
-     *
-     * @param scale The new scale vector
-     */
-    public void setScale(Vector3f scale) {
-        this.scale.set(scale);
-    }
-
-    /**
-     * Gets the entity's model.
-     *
-     * @return The entity's 3D model
+     * @return The model
      */
     public Model getModel() {
         return model;
     }
-    
+
     /**
-     * Sets the entity's model.
+     * Sets a new model for this entity.
      *
-     * @param model The new 3D model
+     * @param model The new model
      */
     public void setModel(Model model) {
         this.model = model;
+        this.hasTransparentTexture = model.hasTransparentTexture();
     }
 
     /**
-     * Gets the entity's position.
+     * Gets the position of this entity.
      *
      * @return The position vector
      */
@@ -161,21 +82,168 @@ public class Entity {
     }
 
     /**
-     * Gets the entity's rotation.
+     * Gets the rotation of this entity.
      *
-     * @return The rotation vector in degrees
+     * @return The rotation vector (in degrees)
      */
     public Vector3f getRotation() {
         return rotation;
     }
 
     /**
-     * Gets the entity's scale.
+     * Gets the scale of this entity.
      *
      * @return The scale vector
      */
     public Vector3f getScale() {
         return scale;
+    }
+
+    /**
+     * Checks if this entity has a transparent texture.
+     *
+     * @return True if the entity has a transparent texture
+     */
+    public boolean hasTransparentTexture() {
+        return hasTransparentTexture;
+    }
+
+    /**
+     * Sets whether this entity has a transparent texture.
+     *
+     * @param hasTransparentTexture True if the entity has a transparent texture
+     */
+    public void setHasTransparentTexture(boolean hasTransparentTexture) {
+        this.hasTransparentTexture = hasTransparentTexture;
+    }
+
+    /**
+     * Checks if this entity uses Y-axis (horizontal) billboarding.
+     *
+     * @return True if Y-axis billboarding is enabled
+     */
+    public boolean isBillboardY() {
+        return billboardY;
+    }
+
+    /**
+     * Sets whether this entity should use Y-axis (horizontal) billboarding.
+     * When enabled, the entity will rotate around the Y-axis to face the camera.
+     * Note: Setting this to true will automatically disable full billboarding.
+     *
+     * @param billboardY True to enable Y-axis billboarding
+     */
+    public void setBillboardY(boolean billboardY) {
+        this.billboardY = billboardY;
+        if (billboardY) {
+            this.billboardFull = false; // Cannot have both types at once
+        }
+    }
+
+    /**
+     * Checks if this entity uses full billboarding.
+     *
+     * @return True if full billboarding is enabled
+     */
+    public boolean isBillboardFull() {
+        return billboardFull;
+    }
+
+    /**
+     * Sets whether this entity should use full billboarding.
+     * When enabled, the entity will always fully face the camera from any angle.
+     * Note: Setting this to true will automatically disable Y-axis billboarding.
+     *
+     * @param billboardFull True to enable full billboarding
+     */
+    public void setBillboardFull(boolean billboardFull) {
+        this.billboardFull = billboardFull;
+        if (billboardFull) {
+            this.billboardY = false; // Cannot have both types at once
+        }
+    }
+
+    /**
+     * Increments the position of this entity.
+     *
+     * @param dx The change in x
+     * @param dy The change in y
+     * @param dz The change in z
+     */
+    public void incrementPosition(float dx, float dy, float dz) {
+        position.x += dx;
+        position.y += dy;
+        position.z += dz;
+    }
+
+    /**
+     * Increments the rotation of this entity.
+     *
+     * @param dx The change in x rotation (degrees)
+     * @param dy The change in y rotation (degrees)
+     * @param dz The change in z rotation (degrees)
+     */
+    public void incrementRotation(float dx, float dy, float dz) {
+        rotation.x += dx;
+        rotation.y += dy;
+        rotation.z += dz;
+    }
+
+    /**
+     * Sets the absolute position of this entity.
+     *
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @param z The z coordinate
+     */
+    public void setPosition(float x, float y, float z) {
+        position.x = x;
+        position.y = y;
+        position.z = z;
+    }
+
+    /**
+     * Sets the absolute position of this entity.
+     *
+     * @param position The new position vector
+     */
+    public void setPosition(Vector3f position) {
+        this.position.set(position);
+    }
+
+    /**
+     * Sets the absolute rotation of this entity.
+     *
+     * @param x The x rotation (degrees)
+     * @param y The y rotation (degrees)
+     * @param z The z rotation (degrees)
+     */
+    public void setRotation(float x, float y, float z) {
+        rotation.x = x;
+        rotation.y = y;
+        rotation.z = z;
+    }
+
+    /**
+     * Sets the absolute rotation of this entity.
+     *
+     * @param rotation The new rotation vector (in degrees)
+     */
+    public void setRotation(Vector3f rotation) {
+        this.rotation.set(rotation);
+    }
+
+    /**
+     * Sets the absolute scale of this entity.
+     *
+     * @param x The x scale
+     * @param y The y scale
+     * @param z The z scale
+     */
+    public void setScale(float x, float y, float z) {
+        scale.x = x;
+        scale.y = y;
+        scale.z = z;
     }
     
     // Legacy method aliases for backward compatibility
@@ -205,19 +273,19 @@ public class Entity {
     }
     
     /**
-     * @deprecated Use {@link #setPosition(float, float, float)} instead
-     */
-    @Deprecated
-    public void setPos(float x, float y, float z) {
-        setPosition(x, y, z);
-    }
-    
-    /**
      * @deprecated Use {@link #incrementRotation(float, float, float)} instead
      */
     @Deprecated
     public void incRot(float x, float y, float z) {
         incrementRotation(x, y, z);
+    }
+    
+    /**
+     * @deprecated Use {@link #setPosition(float, float, float)} instead
+     */
+    @Deprecated
+    public void setPos(float x, float y, float z) {
+        setPosition(x, y, z);
     }
     
     /**

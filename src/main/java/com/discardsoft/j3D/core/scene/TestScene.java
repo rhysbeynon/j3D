@@ -1,12 +1,14 @@
 package com.discardsoft.j3D.core.scene;
 
-import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.ObjectLoader;
 import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.entity.terrain.Terrain;
 import com.discardsoft.j3D.core.entity.terrain.TerrainEntity;
 import com.discardsoft.j3D.core.utils.LoadModel;
+
+import java.util.Random;
+
 import org.joml.Vector3f;
 
 /**
@@ -44,7 +46,7 @@ public class TestScene extends BaseScene {
     public void initialize() {
         try {
             // Create terrain first (so it's drawn first)
-            createTerrain();
+            createTerrain("ground1");
             
             // Add some additional models to the scene to show scale
             addSceneModels();
@@ -62,7 +64,7 @@ public class TestScene extends BaseScene {
     /**
      * Creates and adds a terrain to the scene.
      */
-    private void createTerrain() throws Exception {
+    private void createTerrain(String texture) throws Exception {
         // Get the object loader
         ObjectLoader loader = new ObjectLoader();
         
@@ -77,7 +79,7 @@ public class TestScene extends BaseScene {
             TERRAIN_HEIGHT,
             terrainPosition,
             loader,
-            "src/main/resources/textures/defaulttex.png",
+            "src/main/resources/textures/" + texture + ".png",
             TEXTURE_REPEAT
         );
         
@@ -99,6 +101,27 @@ public class TestScene extends BaseScene {
             new Vector3f(1.0f, 1.0f, 1.0f)
         );
         addEntity(suzanneEntity);
+        
+        // Create a 100 x 100 grid of grass sprites at y=1.2
+        Model grassModel = LoadModel.model("grass2D", "T_shrub2");
+        Random random = new Random();
+        float spacing = 1.0f; // Controls how closely packed the grass is
+        float startX = -40.0f; // Starting X position (centered)
+        float startZ = -40.0f; // Starting Z position (centered)
+        
+        for (int z = 0; z < 50; z++) {
+            for (int x = 0; x < 50; x++) {
+                Entity grassEntity = new Entity(
+                    grassModel,
+                    new Vector3f(startX + x * spacing * random.nextFloat(1.2f), 0.2f, startZ + z * spacing * random.nextFloat(1.2f)),
+                    new Vector3f(0.0f, 0.0f, 0.0f),
+                    new Vector3f(0.8f, 0.8f, 0.8f)
+                );
+                grassEntity.setBillboardY(true);
+                grassEntity.setHasTransparentTexture(true);
+                addEntity(grassEntity);
+            }
+        }
     }
     
     @Override

@@ -412,4 +412,17 @@ public class TestGame implements IGameLogic {
         renderer.cleanup();
         loader.cleanup();
     }
+    
+    /**
+     * Gets the player object.
+     * <p>
+     * This method provides access to the player entity, which contains
+     * the camera used for rendering and billboarding calculations.
+     * </p>
+     *
+     * @return The player entity
+     */
+    public Player getPlayer() {
+        return player;
+    }
 }

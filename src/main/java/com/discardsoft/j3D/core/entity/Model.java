@@ -95,6 +95,26 @@ public class Model {
     }
     
     /**
+     * Checks if this model has a texture that contains transparency.
+     * <p>
+     * Currently this is determined by looking at the texture name.
+     * Textures containing "grass" or "T_" prefixes are considered transparent.
+     * </p>
+     *
+     * @return True if the model's texture contains transparency
+     */
+    public boolean hasTransparentTexture() {
+        // If there's no texture, there can't be transparency
+        if (texture == null || texture.getName() == null) {
+            return false;
+        }
+        
+        // Simple check for common transparent texture patterns
+        String name = texture.getName().toLowerCase();
+        return name.contains("grass") || name.startsWith("t_");
+    }
+    
+    /**
      * @deprecated Use {@link #getVaoId()} instead
      */
     @Deprecated

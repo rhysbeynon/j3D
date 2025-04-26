@@ -1,5 +1,6 @@
 package com.discardsoft.j3D.core.utils;
 
+import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.entity.Entity;
 import org.joml.Matrix4f;
@@ -41,12 +42,79 @@ public final class Transformation {
         Vector3f rotation = entity.getRotation();
         Vector3f scale = entity.getScale();
         
-        return matrix.identity()
-            .translate(position)
-            .rotateX((float) Math.toRadians(rotation.x))
-            .rotateY((float) Math.toRadians(rotation.y))
-            .rotateZ((float) Math.toRadians(rotation.z))
-            .scale(scale);
+        // Translate to the entity position first (common for all modes)
+        matrix.identity().translate(position);
+        
+        // Handle different billboard modes
+        if (!entity.isBillboardY() && !entity.isBillboardFull()) {
+            // Standard rotation (no billboarding)
+            matrix.rotateX((float) Math.toRadians(rotation.x))
+                  .rotateY((float) Math.toRadians(rotation.y))
+                  .rotateZ((float) Math.toRadians(rotation.z));
+        } else {
+            // We need camera information for billboarding
+            Camera camera = Main.getCurrentCamera();
+            if (camera != null) {
+                if (entity.isBillboardY()) {
+                    // Y-axis only billboarding (horizontal rotation only)
+                    // Calculate the angle between the camera and entity in the XZ plane
+                    Vector3f cameraPos = camera.getPosition();
+                    float dx = cameraPos.x - position.x;
+                    float dz = cameraPos.z - position.z;
+                    float angleY = (float) Math.toDegrees(Math.atan2(dx, dz));
+                    
+                    // Apply the calculated Y rotation, but keep entity's original X and Z rotations
+                    matrix.rotateX((float) Math.toRadians(rotation.x))
+                          .rotateY((float) Math.toRadians(angleY))
+                          .rotateZ((float) Math.toRadians(rotation.z));
+                } else if (entity.isBillboardFull()) {
+                    // Full billboarding - entity always fully faces the camera
+                    // Get camera position
+                    Vector3f cameraPos = camera.getPosition();
+                    Vector3f direction = new Vector3f();
+                    
+                    // Calculate direction from entity to camera
+                    direction.x = cameraPos.x - position.x;
+                    direction.y = cameraPos.y - position.y;
+                    direction.z = cameraPos.z - position.z;
+                    direction.normalize();
+                    
+                    // Create a look-at matrix for the entity to face the camera
+                    // Calculate right vector as cross product of up and direction
+                    Vector3f right = new Vector3f();
+                    Vector3f up = new Vector3f(0, 1, 0); // World up
+                    right.x = direction.z;
+                    right.y = 0;
+                    right.z = -direction.x;
+                    right.normalize();
+                    
+                    // Calculate corrected up vector to ensure orthogonality
+                    Vector3f correctedUp = new Vector3f();
+                    correctedUp.x = direction.y * right.z - direction.z * right.y;
+                    correctedUp.y = direction.z * right.x - direction.x * right.z;
+                    correctedUp.z = direction.x * right.y - direction.y * right.x;
+                    correctedUp.normalize();
+                    
+                    // Create a rotation matrix based on these vectors (right, up, forward)
+                    // Using set() method instead of constructor with array
+                    Matrix4f lookAt = new Matrix4f();
+                    lookAt.set(
+                        right.x, right.y, right.z, 0,
+                        correctedUp.x, correctedUp.y, correctedUp.z, 0,
+                        -direction.x, -direction.y, -direction.z, 0,
+                        0, 0, 0, 1
+                    );
+                    
+                    // Apply this rotation to our transformation
+                    matrix.mul(lookAt);
+                }
+            }
+        }
+        
+        // Scale is always applied last
+        matrix.scale(scale);
+        
+        return matrix;
     }
 
     /**

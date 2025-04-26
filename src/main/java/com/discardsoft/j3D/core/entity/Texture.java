@@ -14,6 +14,9 @@ public class Texture {
 
     /** The OpenGL texture ID */
     private final int textureId;
+    
+    /** The texture name/path (used for identification) */
+    private String name;
 
     /**
      * Constructs a new texture with the specified OpenGL texture ID.
@@ -23,6 +26,17 @@ public class Texture {
     public Texture(int textureId) {
         this.textureId = textureId;
     }
+    
+    /**
+     * Constructs a new texture with the specified OpenGL texture ID and name.
+     *
+     * @param textureId The OpenGL texture ID
+     * @param name The texture name or path
+     */
+    public Texture(int textureId, String name) {
+        this.textureId = textureId;
+        this.name = name;
+    }
 
     /**
      * Gets the OpenGL texture ID.
@@ -31,6 +45,24 @@ public class Texture {
      */
     public int getTextureId() {
         return textureId;
+    }
+    
+    /**
+     * Gets the texture name or path.
+     *
+     * @return The texture name
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * Sets the texture name or path.
+     *
+     * @param name The texture name or path
+     */
+    public void setName(String name) {
+        this.name = name;
     }
     
     /**

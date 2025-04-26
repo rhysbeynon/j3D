@@ -29,12 +29,12 @@ public final class Settings {
     public static final boolean RESIZABLE = false;
     
     /** Vertical synchronization flag. When true, synchronizes frame rendering with monitor refresh rate. */
-    public static final boolean VSYNC = false;
+    public static final boolean VSYNC = true;
     
     //---------- Camera Settings ----------//
     
     /** Speed multiplier for camera movement. Higher values make the camera move faster. */
-    public static final float CAMERA_MOVE_SPEED = 0.4f;
+    public static final float CAMERA_MOVE_SPEED = 0.16f;
     
     /** Sensitivity multiplier for mouse movement. Higher values make the camera rotate faster. */
     public static final float MOUSE_SENSITIVITY = 0.2f;

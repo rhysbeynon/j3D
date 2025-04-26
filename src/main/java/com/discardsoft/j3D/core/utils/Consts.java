@@ -22,7 +22,7 @@ public final class Consts {
     //---------- Version and Branding ----------//
     
     /** Engine version string displayed in window title and logs */
-    public static final String VERSION = "v0.06a";
+    public static final String VERSION = "v0.07a";
     
     /** Author/company name */
     public static final String AUTHOR = "DiscardSoft";
