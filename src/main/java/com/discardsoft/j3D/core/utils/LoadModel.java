@@ -20,10 +20,10 @@ public final class LoadModel {
     private static final ObjectLoader loader = new ObjectLoader();
     
     /** Path to model resources */
-    private static final String MODELS_PATH = "src/main/resources/models/";
+    public static final String MODELS_PATH = "src/main/resources/models/";
     
     /** Path to texture resources */
-    private static final String TEXTURES_PATH = "src/main/resources/textures/";
+    public static final String TEXTURES_PATH = "src/main/resources/textures/";
 
     /**
      * Private constructor to prevent instantiation of utility class.
@@ -102,5 +102,27 @@ public final class LoadModel {
             System.err.println("Critical error: Failed to load error model: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Utility method for creating a quad model for UI elements.
+     * 
+     * @param positions The positions of the vertices
+     * @param textureCoords The texture coordinates
+     * @param indices The indices of the vertices
+     * @return A Model representation of the quad
+     */
+    public static Model loadQuadModel(float[] positions, float[] textureCoords, int[] indices) {
+        // Create the normals (all pointing forward for UI quads)
+        float[] normals = new float[positions.length];
+        for (int i = 0; i < positions.length / 3; i++) {
+            normals[i * 3] = 0;
+            normals[i * 3 + 1] = 0;
+            normals[i * 3 + 2] = 1;
+        }
+        
+        // Create the model using ObjectLoader
+        ObjectLoader loader = new ObjectLoader();
+        return loader.loadModel(positions, textureCoords, normals, indices);
     }
 }

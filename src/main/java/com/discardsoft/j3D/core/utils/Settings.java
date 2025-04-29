@@ -41,4 +41,9 @@ public final class Settings {
     
     /** Field of view angle in radians. Controls the camera's viewing angle. */
     public static final float FOV = (float) Math.toRadians(70);
+
+    //---------- UI Settings ----------//
+    
+    /** Global scale multiplier for UI elements. Higher values make UI elements larger. */
+    public static float UI_SCALE = 1.4f;
 }

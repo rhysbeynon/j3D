@@ -531,4 +531,19 @@ public class WindowManager {
             listener.accept(focused);
         }
     }
+
+    /**
+     * Creates an orthographic projection matrix for 2D UI rendering.
+     * <p>
+     * This creates a 2D projection with coordinates from -1 to 1 in both axes,
+     * which is ideal for UI elements that should be displayed in normalized device coordinates.
+     * </p>
+     * 
+     * @return An orthographic projection matrix for 2D rendering
+     */
+    public Matrix4f getOrthographicMatrix() {
+        Matrix4f orthoMatrix = new Matrix4f();
+        orthoMatrix.setOrtho(-1f, 1f, -1f, 1f, -1f, 1f);
+        return orthoMatrix;
+    }
 }

@@ -72,4 +72,26 @@ public class Texture {
     public int getId() {
         return getTextureId();
     }
+
+    /**
+     * Checks if this texture has transparency.
+     * <p>
+     * Transparency is determined by examining the texture name.
+     * Textures with names containing "T_" prefix or certain keywords
+     * are considered to have transparency.
+     * </p>
+     * 
+     * @return true if the texture has transparency, false otherwise
+     */
+    public boolean hasTransparency() {
+        if (name == null) {
+            return false;
+        }
+        
+        String lowerName = name.toLowerCase();
+        return lowerName.startsWith("t_") || 
+               lowerName.contains("grass") ||
+               lowerName.contains("transparent") || 
+               lowerName.contains("menu");
+    }
 }

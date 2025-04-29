@@ -342,6 +342,12 @@ public void render() {
 
 When working with the j3D engine, follow these best practices:
 
+### Creating Tools
+
+1. **Create ReUsable and improvable tools**: Think of the future of these tools while creating them. Avoid developing unique systems for simple things. Instead, build on existing features before adding to the pile so to speak.
+2. **Build tools for dumb people**: When you create tools and methods for repeated use, you should attempt to create them usable by less technically inclined, sleep deprived, engineers. Simple and easy to comprehend.
+3. **Reuasable**: If you make a function and only use it once, it shouldnt need its own class. Keep methods to their own class and try to build on currently existing classes if the subject matter is similar. Only create new classes if its a completely foreign topic that hasn'e been implemented yet.
+
 ### Scene Management
 
 1. **Use the scene-based approach**: Add entities to scenes and render entire scenes rather than individual entities.

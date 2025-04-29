@@ -46,12 +46,11 @@ public class TestScene extends BaseScene {
     public void initialize() {
         try {
             // Create terrain first (so it's drawn first)
-            createTerrain("ground1");
+            createTerrain("ground2");
             
             // Add some additional models to the scene to show scale
             addSceneModels();
-            
-            // Set custom light position - raised higher for better terrain lighting
+              // Set custom light position - raised higher for better terrain lighting
             getLight().setPosition(30.0f, 50.0f, 30.0f);
             getLight().setAmbient(0.3f, 0.3f, 0.3f); // Increase ambient light for terrain
             
@@ -102,26 +101,7 @@ public class TestScene extends BaseScene {
         );
         addEntity(suzanneEntity);
         
-        // Create a 100 x 100 grid of grass sprites at y=1.2
-        Model grassModel = LoadModel.model("grass2D", "T_shrub2");
-        Random random = new Random();
-        float spacing = 1.0f; // Controls how closely packed the grass is
-        float startX = -40.0f; // Starting X position (centered)
-        float startZ = -40.0f; // Starting Z position (centered)
-        
-        for (int z = 0; z < 50; z++) {
-            for (int x = 0; x < 50; x++) {
-                Entity grassEntity = new Entity(
-                    grassModel,
-                    new Vector3f(startX + x * spacing * random.nextFloat(1.2f), 0.2f, startZ + z * spacing * random.nextFloat(1.2f)),
-                    new Vector3f(0.0f, 0.0f, 0.0f),
-                    new Vector3f(0.8f, 0.8f, 0.8f)
-                );
-                grassEntity.setBillboardY(true);
-                grassEntity.setHasTransparentTexture(true);
-                addEntity(grassEntity);
-            }
-        }
+
     }
     
     @Override

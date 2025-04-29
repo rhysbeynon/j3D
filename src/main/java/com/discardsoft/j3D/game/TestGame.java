@@ -13,6 +13,10 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+// Add the UI imports
+import com.discardsoft.j3D.core.ui.UIManager;
+import com.discardsoft.j3D.core.ui.PauseMenu;
+
 /**
  * Test implementation of game logic.
  * <p>
@@ -80,6 +84,12 @@ public class TestGame implements IGameLogic {
     private float deltaTime;
     private long lastFrameTime;
 
+    /** UI management system */
+    private UIManager uiManager;
+    
+    /** Pause menu UI element */
+    private PauseMenu pauseMenu;
+
     /**
      * Constructs a new TestGame instance.
      * <p>
@@ -110,6 +120,15 @@ public class TestGame implements IGameLogic {
         
         // Initialize debug HUD
         debugHUD = new DebugHUD(window.getWidth(), window.getHeight());
+        
+        // Initialize UI system
+        uiManager = new UIManager(window);
+        
+        // Create and configure pause menu
+        pauseMenu = new PauseMenu();
+        pauseMenu.setResumeAction(this::resumeGame);
+        pauseMenu.hide(); // Start hidden
+        uiManager.addElement(pauseMenu);
         
         // Initialize time tracking for animations
         lastFrameTime = System.currentTimeMillis();
@@ -253,6 +272,7 @@ public class TestGame implements IGameLogic {
     private void pauseGame() {
         gamePaused = true;
         window.releaseCursor();
+        pauseMenu.show(); // Show the pause menu
         System.out.println("PAUSE");
     }
     
@@ -265,6 +285,7 @@ public class TestGame implements IGameLogic {
         if (window.isWindowFocused()) {
             window.captureCursor();
             gamePaused = false;
+            pauseMenu.hide(); // Hide the pause menu
             
             // Reset the time tracking to prevent large delta time after resuming
             lastFrameTime = System.currentTimeMillis();
@@ -345,6 +366,9 @@ public class TestGame implements IGameLogic {
         deltaTime = (currentTime - lastFrameTime) / 1000.0f;
         lastFrameTime = currentTime;
         
+        // Update UI elements (even when paused)
+        uiManager.update(window);
+        
         // Skip updates if the game is paused
         if (gamePaused) {
             return;
@@ -388,21 +412,15 @@ public class TestGame implements IGameLogic {
         // Render the scene using the player's camera
         renderer.render(scene, player.getCamera());
         
+        // Render UI elements
+        uiManager.render();
+        
         // Update current FPS value from EngineManager
         currentFps = (int) EngineManager.getFps();
         
         // Render debug HUD if enabled
         if (showDebugHUD && debugHUD != null) {
             debugHUD.render(currentFps, player, scene, player.isFreeCameraMode() ? currentCameraMoveSpeed : DEFAULT_CAMERA_MOVE_SPEED);
-        }
-        
-        // Display a pause message when game is paused
-        if (gamePaused) {
-            // Draw "PAUSED" text in the center of the screen
-            // In the future, this will render a proper pause menu with a resume button
-            if (debugHUD != null) {
-                debugHUD.renderPauseOverlay();
-            }
         }
     }
 
@@ -411,6 +429,11 @@ public class TestGame implements IGameLogic {
         scene.cleanup();
         renderer.cleanup();
         loader.cleanup();
+        
+        // Clean up UI resources
+        if (uiManager != null) {
+            uiManager.cleanup();
+        }
     }
     
     /**

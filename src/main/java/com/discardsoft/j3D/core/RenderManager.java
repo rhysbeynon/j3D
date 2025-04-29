@@ -69,8 +69,8 @@ public class RenderManager {
      */
     public void init() throws Exception {
         shader = new ShaderManager();
-        shader.createVertexShader(Utils.loadResource("/shaders/vertex.vs"));
-        shader.createFragmentShader(Utils.loadResource("/shaders/fragment.fs"));
+        shader.createVertexShader(Utils.loadResource("/shaders/vertex.glsl"));
+        shader.createFragmentShader(Utils.loadResource("/shaders/fragment.glsl"));
         shader.link();
         
         // Create model transformation uniforms
@@ -229,7 +229,7 @@ public class RenderManager {
         GL15.glActiveTexture(GL15.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, entity.getModel().getTexture().getTextureId());
         
-        // Set texture filtering to nearest (pixelated look)
+        // Set texture filtering to nearest (pixelated look) for all textures
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         
