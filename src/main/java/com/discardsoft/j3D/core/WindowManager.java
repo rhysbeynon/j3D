@@ -163,20 +163,21 @@ public class WindowManager {
             GLFW.glfwSetInputMode(window, GLFW.GLFW_RAW_MOUSE_MOTION, GLFW.GLFW_TRUE);
         }
 
-        /*
-        This handles memory allocation for the window frame buffer.
-        It takes window information to create a framebuffer and uses
-        a callback to change the framebuffer size when window params
-        are changed for instance.
-         */
+        // Make the OpenGL context current before setting up callbacks
+        GLFW.glfwMakeContextCurrent(window);
+
+        // Set up the framebuffer size callback after making the context current
         GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
             this.width = width;
             this.height = height;
-            glViewport(0,0,width, height);
+            glViewport(0, 0, width, height);
             // Update projection matrix with new aspect ratio
             float aspectRatio = (float) width / (float) height;
             projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
         });
+
+        // Initialize OpenGL capabilities after making the context current
+        GL.createCapabilities();
 
         /*
         Key callback for force quit shortcut.
