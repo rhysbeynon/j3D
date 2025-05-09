@@ -406,19 +406,19 @@ public class TestGame implements IGameLogic {
             window.setResize(false);  // Reset the resize flag
         }
 
-        // Set window background to blue sky color
-        window.setClearColor(0.3f, 0.5f, 1.0f, 1.0f);
+        // set clear color to black
+        window.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         
-        // Render the scene using the player's camera
+        // render the scene using the player's camera
         renderer.render(scene, player.getCamera());
         
-        // Render UI elements
+        // render UI elements
         uiManager.render();
         
-        // Update current FPS value from EngineManager
+        // update current fps value from EngineManager
         currentFps = (int) EngineManager.getFps();
         
-        // Render debug HUD if enabled
+        // render debug HUD if enabled
         if (showDebugHUD && debugHUD != null) {
             debugHUD.render(currentFps, player, scene, player.isFreeCameraMode() ? currentCameraMoveSpeed : DEFAULT_CAMERA_MOVE_SPEED);
         }
@@ -430,7 +430,7 @@ public class TestGame implements IGameLogic {
         renderer.cleanup();
         loader.cleanup();
         
-        // Clean up UI resources
+        // clean up UI resources
         if (uiManager != null) {
             uiManager.cleanup();
         }
