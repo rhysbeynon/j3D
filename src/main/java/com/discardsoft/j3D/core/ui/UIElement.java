@@ -190,12 +190,12 @@ public abstract class UIElement {
      * @param height The desired height
      */
     public void setSizeFromHeight(float height) {
-      2.height = height;
+        this.height = height;
         
         if (hasImageDimensions) {
             // Calculate width based on image aspect ratio
             float aspectRatio = (float)imageWidth / imageHeight;
-     1 * aspectRatio;
+            this.width = height * aspectRatio;
         } else {
             // Fall back to 1:1 aspect ratio
             this.width = height;

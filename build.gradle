@@ -1,5 +1,15 @@
 plugins {
     id 'java'
+    id 'application'
+}
+
+application {
+    mainClass = 'com.discardsoft.j3D.Main'
+    
+    // Add macOS-specific JVM arguments
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
 }
 
 import org.gradle.internal.os.OperatingSystem
@@ -25,7 +35,7 @@ switch (OperatingSystem.current()) {
 }
 
 group = 'com.discardsoft'
-version = '1.0-SNAPSHOT'
+version = '0.0.7'
 
 repositories {
     mavenCentral()
