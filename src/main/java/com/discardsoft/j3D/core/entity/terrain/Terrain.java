@@ -98,6 +98,42 @@ public class Terrain {
     }
     
     /**
+     * Gets the size of the terrain.
+     *
+     * @return The terrain size in world units
+     */
+    public float getSize() {
+        return size;
+    }
+    
+    /**
+     * Gets the number of grid cells along each axis.
+     *
+     * @return The grid count
+     */
+    public int getGridCount() {
+        return gridCount;
+    }
+    
+    /**
+     * Gets the height (y-position) of the terrain.
+     *
+     * @return The terrain height
+     */
+    public float getHeight() {
+        return height;
+    }
+    
+    /**
+     * Gets the texture repeat count.
+     *
+     * @return The number of times the texture is repeated across the terrain
+     */
+    public float getTextureRepeatCount() {
+        return textureRepeatCount;
+    }
+    
+    /**
      * Generates the terrain mesh data and creates a model.
      *
      * @param loader The object loader to use

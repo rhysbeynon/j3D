@@ -65,6 +65,11 @@ public abstract class BaseScene implements IScene {
     }
 
     @Override
+    public void clearEntities() {
+        entities.clear();
+    }
+
+    @Override
     public List<Entity> getEntities() {
         return Collections.unmodifiableList(entities);
     }

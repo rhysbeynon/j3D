@@ -3,11 +3,12 @@ package com.discardsoft.j3D.game;
 import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.*;
 import com.discardsoft.j3D.core.entity.Camera;
+import com.discardsoft.j3D.core.entity.Entity;
+import com.discardsoft.j3D.core.entity.Model;
 import com.discardsoft.j3D.core.entity.Player;
 import com.discardsoft.j3D.core.scene.TestScene;
 import com.discardsoft.j3D.core.utils.DebugHUD;
 import com.discardsoft.j3D.core.utils.Settings;
-import com.discardsoft.j3D.core.utils.Consts;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -16,6 +17,9 @@ import org.lwjgl.opengl.GL11;
 // Add the UI imports
 import com.discardsoft.j3D.core.ui.UIManager;
 import com.discardsoft.j3D.core.ui.PauseMenu;
+
+// Add the level loading imports
+import com.discardsoft.j3D.core.level.LevelLoader;
 
 /**
  * Test implementation of game logic.
@@ -108,12 +112,21 @@ public class TestGame implements IGameLogic {
         // Initialize rendering system
         renderer.init();
         
-        // Create and initialize the scene
-        scene = new TestScene();
-        scene.initialize();
+        // Load the scene from j3dl file instead of creating a hardcoded TestScene
+        LevelLoader levelLoader = new LevelLoader(loader);
+        String levelPath = "src/main/resources/levels/test_level.j3dl";
+        LevelLoader.LoadedLevel loadedLevel = levelLoader.loadLevel(levelPath);
         
-        // Create player at origin
-        player = new Player(new Vector3f(0.0f, 0.0f, 0.0f));
+        // Set the loaded scene
+        scene = loadedLevel.scene;
+        
+        // Create player at default spawn point (or at origin if no spawn points defined)
+        Vector3f playerPos = new Vector3f(0.0f, 0.0f, 0.0f);
+        if (loadedLevel.spawns != null && !loadedLevel.spawns.isEmpty()) {
+            // Use the first spawn point
+            playerPos = loadedLevel.spawns.get(0).position;
+        }
+        player = new Player(playerPos);
         
         // Add player's bounding entity to the scene
         scene.addEntity(player.getBoundingEntity());
@@ -349,6 +362,9 @@ public class TestGame implements IGameLogic {
             showDebugHUD = !showDebugHUD;
             System.out.println("Debug HUD: " + (showDebugHUD ? "ON" : "OFF"));
         }
+        
+        // Level loading hotkeys (for testing)
+        handleLevelLoadingInput();
     }
     
     /**
@@ -447,5 +463,205 @@ public class TestGame implements IGameLogic {
      */
     public Player getPlayer() {
         return player;
+    }
+    
+    /**
+     * Handles level loading input for development testing.
+     */
+    private void handleLevelLoadingInput() {
+        // Hotkey for loading a test level (L key)
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_L)) {
+            loadTestLevel();
+        }
+        
+        // Hotkey for unloading the current level (U key)
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_U)) {
+            unloadCurrentLevel();
+        }
+        
+        // F5 - Save current level
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_F5)) {
+            saveCurrentLevel();
+        }
+        
+        // F6 - Load saved level
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_F6)) {
+            loadSavedLevel();
+        }
+        
+        // F7 - Apply/reload current level
+        if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_F7)) {
+            applyReloadLevel();
+        }
+    }
+    
+    /**
+     * Loads a test level for development purposes.
+     */
+    private void loadTestLevel() {
+        System.out.println("Loading test level...");
+        // Example: Load a level from a file or create it procedurally
+        // LevelLoader.loadLevel("path/to/level/file");
+        
+        // For now, let's just add a test entity to the scene
+        try {
+            Model cubeModel = com.discardsoft.j3D.core.utils.LoadModel.model("P_Cube");
+            Entity testEntity = new Entity(
+                cubeModel,
+                new Vector3f(2.0f, 1.0f, -3.0f), // Position it near the Suzanne model
+                new Vector3f(0.0f, 0.0f, 0.0f),   // No rotation
+                new Vector3f(0.5f, 0.5f, 0.5f)    // Half scale
+            );
+            scene.addEntity(testEntity);
+            System.out.println("Test entity added to scene.");
+        } catch (Exception e) {
+            System.err.println("Failed to load test entity: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Unloads the current level, if any.
+     */
+    private void unloadCurrentLevel() {
+        System.out.println("Unloading current level...");
+        // Example: Remove all entities from the scene or reset the level
+        scene.clearEntities();
+    }
+    
+    /**
+     * Saves the current level to a JSON file (F5 functionality).
+     */
+    private void saveCurrentLevel() {
+        try {
+            System.out.println("Saving current level...");
+            
+            // Create level loader instance
+            LevelLoader levelLoader = new LevelLoader(loader);
+            
+            // Create LoadedLevel from current scene
+            LevelLoader.LoadedLevel currentLevel = createLoadedLevelFromScene();
+            
+            // Define save path (you can customize this path as needed)
+            String savePath = "saved_level.json";
+            
+            // Save the level
+            levelLoader.saveLevel(currentLevel, savePath);
+            
+            System.out.println("Level saved successfully to: " + savePath);
+            
+        } catch (Exception e) {
+            System.err.println("Failed to save level: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Loads a previously saved level from JSON file (F6 functionality).
+     */
+    private void loadSavedLevel() {
+        try {
+            System.out.println("Loading saved level...");
+            
+            // Create level loader instance
+            LevelLoader levelLoader = new LevelLoader(loader);
+            
+            // Define load path (should match the save path)
+            String loadPath = "saved_level.json";
+            
+            // Clear current scene first
+            scene.clearEntities();
+            
+            // Load the level
+            LevelLoader.LoadedLevel loadedLevel = levelLoader.loadLevel(loadPath);
+            
+            // Apply loaded entities to current scene
+            if (loadedLevel.scene != null) {
+                for (LevelLoader.LoadedEntity loadedEntity : loadedLevel.entities) {
+                    scene.addEntity(loadedEntity.entity);
+                }
+                
+                // Add terrain if it exists
+                if (loadedLevel.terrain != null) {
+                    scene.addEntity(loadedLevel.terrain);
+                }
+            }
+            
+            System.out.println("Level loaded successfully from: " + loadPath);
+            
+        } catch (Exception e) {
+            System.err.println("Failed to load level: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Applies/reloads the current level (F7 functionality).
+     * This reloads the current saved level, effectively resetting it.
+     */
+    private void applyReloadLevel() {
+        try {
+            System.out.println("Applying/reloading current level...");
+            
+            // Simply reload the saved level to reset the current state
+            loadSavedLevel();
+            
+        } catch (Exception e) {
+            System.err.println("Failed to apply/reload level: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Creates a LoadedLevel instance from the current scene state.
+     * This is used for saving the current level.
+     */
+    private LevelLoader.LoadedLevel createLoadedLevelFromScene() {
+        LevelLoader.LoadedLevel level = new LevelLoader.LoadedLevel();
+        
+        // Create metadata
+        level.metadata = new LevelLoader.LevelMetadata();
+        level.metadata.name = "Saved Level";
+        level.metadata.description = "Level saved from j3D engine";
+        level.metadata.version = "1.0";
+        level.metadata.author = "j3D User";
+        level.metadata.created = java.time.LocalDateTime.now().toString();
+        level.metadata.modified = level.metadata.created;
+        
+        // Create scene with current light
+        level.scene = new LevelLoader.LoadedScene(scene.getLight());
+        
+        // Convert current entities to LoadedEntity objects
+        for (com.discardsoft.j3D.core.entity.Entity entity : scene.getEntities()) {
+            // Create a basic JSON object for the entity (simplified)
+            com.google.gson.JsonObject entityData = new com.google.gson.JsonObject();
+            entityData.addProperty("model", "unknown"); // We don't have model name access, so use placeholder
+            
+            // Add position data
+            com.google.gson.JsonObject position = new com.google.gson.JsonObject();
+            position.addProperty("x", entity.getPosition().x);
+            position.addProperty("y", entity.getPosition().y);
+            position.addProperty("z", entity.getPosition().z);
+            entityData.add("position", position);
+            
+            // Add rotation data
+            com.google.gson.JsonObject rotation = new com.google.gson.JsonObject();
+            rotation.addProperty("x", entity.getRotation().x);
+            rotation.addProperty("y", entity.getRotation().y);
+            rotation.addProperty("z", entity.getRotation().z);
+            entityData.add("rotation", rotation);
+            
+            // Add scale data
+            com.google.gson.JsonObject scale = new com.google.gson.JsonObject();
+            scale.addProperty("x", entity.getScale().x);
+            scale.addProperty("y", entity.getScale().y);
+            scale.addProperty("z", entity.getScale().z);
+            entityData.add("scale", scale);
+            
+            // Create LoadedEntity
+            LevelLoader.LoadedEntity loadedEntity = new LevelLoader.LoadedEntity(entity, entityData);
+            level.entities.add(loadedEntity);
+        }
+        
+        return level;
     }
 }

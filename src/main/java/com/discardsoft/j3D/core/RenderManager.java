@@ -16,7 +16,7 @@ import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.entity.Camera;
 import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Light;
-import com.discardsoft.j3D.core.scene.TestScene;
+import com.discardsoft.j3D.core.scene.BaseScene;
 import com.discardsoft.j3D.core.utils.Transformation;
 import com.discardsoft.j3D.core.utils.Utils;
 import org.joml.Vector3f;
@@ -98,7 +98,7 @@ public class RenderManager {
      * @param scene The scene to render
      * @param camera The camera from which to view the scene
      */
-    public void render(TestScene scene, Camera camera) {
+    public void render(BaseScene scene, Camera camera) {
         clear();
         
         // Get entities and light from scene
@@ -253,7 +253,7 @@ public class RenderManager {
      * @param entity The entity to render
      * @param camera The camera from which to view the entity
      * @param light The light source for illuminating the entity
-     * @deprecated Use {@link #render(TestScene, Camera)} instead
+     * @deprecated Use {@link #render(BaseScene, Camera)} instead
      */
     @Deprecated
     public void render(Entity entity, Camera camera, Light light) {

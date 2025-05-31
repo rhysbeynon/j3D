@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "name": "Saved Level",
+    "description": "Level saved from j3D engine",
+    "version": "1.0",
+    "author": "j3D User",
+    "created": "2025-05-31T16:17:13.842975",
+    "modified": "2025-05-31T16:17:13.842975"
+  },
+  "lighting": {
+    "position": {
+      "x": 30.0,
+      "y": 50.0,
+      "z": 30.0
+    },
+    "color": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0
+    },
+    "ambient": {
+      "r": 0.3,
+      "g": 0.3,
+      "b": 0.3
+    }
+  },
+  "terrain": {
+    "enabled": false
+  },
+  "entities": [],
+  "spawns": []
+}

@@ -1,5 +1,5 @@
 # j3D Engine Manual
-**Version 0.07a | April 26, 2025**
+**Version 0.07a | May 31, 2025**
 
 <div align="center">
   <img src="src/main/resources/j3D_DARK.png" width="300" alt="j3D Logo">
@@ -12,14 +12,17 @@
 3. [Core Components](#core-components)
 4. [Entity System](#entity-system)
    - [Billboarding System](#billboarding-system)
+   - [Terrain System](#terrain-system)
 5. [Scene Management](#scene-management)
 6. [Rendering System](#rendering-system)
 7. [Input Handling](#input-handling)
-8. [Utility Classes](#utility-classes)
-9. [Character Controller](#character-controller)
-10. [Best Practices](#best-practices)
-11. [Future Development](#future-development)
-12. [Advanced Development Guide](#advanced-development-guide)
+8. [User Interface System](#user-interface-system)
+9. [Debug Tools](#debug-tools)
+10. [Utility Classes](#utility-classes)
+11. [Character Controller](#character-controller)
+12. [Best Practices](#best-practices)
+13. [Future Development](#future-development)
+14. [Advanced Development Guide](#advanced-development-guide)
 
 ## Introduction
 
@@ -53,8 +56,33 @@ com.discardsoft.j3D
 │   ├── ShaderManager     # Shader program handling
 │   ├── WindowManager     # Window and input management
 │   ├── entity            # Entity component system
+│   │   ├── Camera        # Camera entity
+│   │   ├── Entity        # Base entity class
+│   │   ├── Light         # Light entity
+│   │   ├── Model         # 3D model data
+│   │   ├── Player        # Player character controller
+│   │   ├── Texture       # Texture data
+│   │   └── terrain       # Terrain system
+│   │       ├── Terrain   # Terrain generation
+│   │       └── TerrainEntity # Terrain entity wrapper
 │   ├── scene             # Scene management
+│   │   ├── BaseScene     # Abstract scene base class
+│   │   ├── IScene        # Scene interface
+│   │   └── TestScene     # Concrete scene implementation
+│   ├── ui                # User interface system
+│   │   ├── UIElement     # Base UI element
+│   │   ├── UIManager     # UI management
+│   │   ├── Panel         # UI panel component
+│   │   ├── Menu          # Menu system
+│   │   └── PauseMenu     # Pause menu implementation
 │   └── utils             # Helper utilities
+│       ├── Consts        # Engine constants
+│       ├── DebugHUD      # Debug information display
+│       ├── LoadModel     # Model loading utilities
+│       ├── Settings      # Engine settings
+│       ├── TextRenderer  # Text rendering
+│       ├── Transformation # Matrix transformations
+│       └── Utils         # General utilities
 └── game                  # Game implementation
     └── TestGame          # Example game implementation
 ```
@@ -157,6 +185,45 @@ The billboarding system automatically calculates the correct orientation based o
 
 Billboarded entities are automatically rendered with proper transparency if the `hasTransparentTexture` flag is set.
 
+### Terrain System
+
+The j3D engine includes a robust terrain system for creating large-scale ground surfaces and landscapes.
+
+#### Terrain Generation
+
+The terrain system generates terrain meshes from height data and applies textures:
+
+```java
+// Create a terrain with specified parameters
+Terrain terrain = new Terrain(
+    512.0f,                    // terrain size (width and depth)
+    64,                        // grid resolution (64x64 vertices)
+    0.0f,                      // base height (Y position)
+    new Vector3f(-256, 0, -256), // position (centered at origin)
+    objectLoader,              // object loader instance
+    "src/main/resources/textures/ground2.png", // texture path
+    64.0f                      // texture repeat factor
+);
+```
+
+#### TerrainEntity
+
+TerrainEntity wraps the terrain data into an entity that can be added to scenes:
+
+```java
+// Create a terrain entity from terrain data
+TerrainEntity terrainEntity = new TerrainEntity(terrain);
+
+// Add terrain to the scene
+scene.addEntity(terrainEntity);
+```
+
+**Key Features:**
+- **Procedural Generation**: Generate terrain meshes with customizable resolution
+- **Texture Mapping**: Apply textures with configurable repeat factors
+- **Scene Integration**: Seamlessly integrate with the entity/scene system
+- **Performance Optimized**: Efficient mesh generation and rendering
+
 ### Model
 
 Represents a 3D model with:
@@ -197,7 +264,20 @@ Represents a player character in the game world with:
 - `setPosition(x, y, z)`: Set absolute player position (feet position)
 - `getPosition()`: Get current player position
 - `getVelocity()`: Get player's current velocity vector
-- `getPlayerCamera()`: Get the camera position (eye level)
+- `getCamera()`: Get the player's camera instance
+- `getBoundingEntity()`: Get the player's collision entity
+
+#### Global Camera Access
+
+The Main class provides global access to the current camera:
+
+```java
+// Get the current camera from anywhere in the application
+Camera currentCamera = Main.getCurrentCamera();
+
+// This method returns the player's camera if the game and player are initialized
+// Returns null if either is not available
+```
 
 ## Scene Management
 
@@ -241,43 +321,397 @@ Handles GLSL shader programs:
 
 ## Input Handling
 
-Input handling is primarily managed through the WindowManager class, which provides methods to:
-- Check if a key is pressed
-- Check for buffered key presses (pressed once)
-- Process mouse movement
+The j3D engine provides comprehensive input handling through the WindowManager class, supporting both keyboard and mouse input for games and applications.
+
+### Keyboard Input
+
+The WindowManager provides several methods for handling keyboard input:
+
+#### Basic Key Detection
+
+```java
+// Check if a key is currently being held down
+if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
+    // Move forward while W is held
+    player.moveForward();
+}
+
+// Check for single key press (buffered input)
+if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_SPACE)) {
+    // Jump only once per key press
+    player.jump();
+}
+```
+
+**Key Methods:**
+- `isKeyPressed(int keyCode)`: Returns true while a key is held down
+- `isKeyPressedBuffered(int keyCode)`: Returns true only once per key press
+- Built-in support for force quit with backslash key
+
+### Mouse Input
+
+The mouse input system handles both movement and button presses:
+
+#### Mouse Movement
+
+```java
+// Process mouse movement for camera control
+Vector2f mouseMovement = window.processMouseMovement();
+camera.processMouseMovement(mouseMovement.x, mouseMovement.y);
+```
+
+#### Mouse Buttons
+
+```java
+// Check if left mouse button is pressed
+if (window.isMouseButtonPressed()) {
+    // Handle continuous input (e.g., shooting)
+    handleShooting();
+}
+
+// Check for single click events
+if (window.isMouseButtonClicked()) {
+    // Handle one-time actions (e.g., menu selection)
+    selectMenuItem();
+}
+```
+
+#### Scroll Wheel
+
+```java
+// Handle scroll wheel input
+if (window.hasScrolled()) {
+    double scrollOffset = window.getScrollOffset();
+    // Zoom camera or change weapon
+    camera.adjustZoom(scrollOffset);
+}
+```
+
+### Cursor Management
+
+The engine automatically manages cursor capture for camera control:
+
+```java
+// Release cursor (makes it visible, stops camera control)
+window.releaseCursor();
+
+// Capture cursor for camera control
+window.captureCursor();
+
+// Check cursor state
+if (window.isCursorCaptured()) {
+    // Camera control is active
+}
+
+if (window.isWaitingForClick()) {
+    // Cursor released, waiting for click to recapture
+}
+```
+
+### Window Focus Management
+
+The engine handles window focus automatically:
+
+```java
+// Check if window has focus
+if (window.isWindowFocused()) {
+    // Process input normally
+} else {
+    // Window is not focused, pause game or reduce processing
+}
+
+// Add listeners for focus events
+window.addWindowFocusListener(focused -> {
+    if (focused) {
+        System.out.println("Window gained focus");
+    } else {
+        System.out.println("Window lost focus");
+    }
+});
+```
+
+### Input Best Practices
+
+1. **Use buffered input for discrete actions**: Use `isKeyPressedBuffered()` for actions that should only trigger once per key press
+2. **Handle window focus**: The engine automatically pauses cursor capture when the window loses focus
+3. **Mouse sensitivity**: Configure mouse sensitivity in the Settings class
+4. **Raw mouse input**: The engine automatically uses raw mouse input when available for better camera control
+
+### Advanced Input Features
+
+The WindowManager also provides:
+- Automatic cursor capture/release on window focus/unfocus
+- Event listeners for cursor capture and window focus changes
+- Support for raw mouse motion when available
+- Configurable mouse sensitivity through Settings
+
+## User Interface System
+
+The j3D engine provides a comprehensive UI system for creating game interfaces, menus, and HUD elements.
+
+### UI Architecture
+
+The UI system is built around the following components:
+
+#### UIElement
+
+The base class for all UI components:
+
+```java
+/**
+ * Base UI element with position, size, and parent-child relationships
+ */
+public abstract class UIElement {
+    protected Vector2f position;    // Normalized screen coordinates (0-1)
+    protected Vector2f size;        // Normalized size
+    protected UIElement parent;     // Parent element
+    protected List<UIElement> children; // Child elements
+    
+    // Core methods
+    public abstract void render();
+    public abstract void update(float deltaTime);
+    public abstract boolean handleInput(WindowManager window);
+}
+```
+
+#### UIManager
+
+Manages all UI elements and coordinates rendering:
+
+```java
+// Create and use a UI manager
+UIManager uiManager = new UIManager();
+
+// Add UI elements
+uiManager.addElement(panel);
+uiManager.addElement(menu);
+
+// Update and render in game loop
+uiManager.update(deltaTime);
+uiManager.render();
+```
+
+### UI Components
+
+#### Panel
+
+Rectangular UI elements for backgrounds and containers:
+
+```java
+// Create a panel with position, size, and color
+Panel panel = new Panel(
+    new Vector2f(0.1f, 0.1f),      // position (10% from top-left)
+    new Vector2f(0.8f, 0.8f),      // size (80% of screen)
+    new Vector4f(0.2f, 0.2f, 0.2f, 0.8f) // color (dark gray, 80% opacity)
+);
+```
+
+#### Menu System
+
+Create interactive menus with buttons and navigation:
+
+```java
+// Create a main menu
+Menu mainMenu = new Menu(
+    new Vector2f(0.5f, 0.5f),      // centered position
+    new Vector2f(0.4f, 0.6f)       // menu size
+);
+
+// Add menu items with callbacks
+mainMenu.addMenuItem("Start Game", () -> {
+    gameState.setState(GameState.PLAYING);
+});
+
+mainMenu.addMenuItem("Settings", () -> {
+    showSettingsMenu();
+});
+
+mainMenu.addMenuItem("Exit", () -> {
+    System.exit(0);
+});
+```
+
+#### PauseMenu
+
+A specialized menu for game pause functionality:
+
+```java
+// Create and show pause menu
+PauseMenu pauseMenu = new PauseMenu();
+pauseMenu.setVisible(true);
+
+// Handle pause menu input
+if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_ESCAPE)) {
+    pauseMenu.toggle();
+}
+```
+
+### UI Input Handling
+
+UI elements can capture and handle input events:
+
+```java
+// Override handleInput in custom UI elements
+@Override
+public boolean handleInput(WindowManager window) {
+    // Check if mouse is over this element
+    if (isMouseOver(window.getMousePosition())) {
+        // Handle click
+        if (window.isMouseButtonPressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+            onClick();
+            return true; // Input consumed
+        }
+    }
+    return false; // Input not consumed
+}
+```
+
+## Debug Tools
+
+The j3D engine includes comprehensive debugging tools to assist with development and troubleshooting.
+
+### DebugHUD
+
+The DebugHUD displays real-time information about the game state:
+
+```java
+// Create and initialize debug HUD
+DebugHUD debugHUD = new DebugHUD(window);
+
+// Render debug information in the game loop
+debugHUD.render(
+    currentFps,           // Current FPS
+    player,              // Player entity for position/velocity info
+    scene,               // Scene for entity count
+    cameraMoveSpeed      // Current camera movement speed
+);
+```
+
+**Debug Information Displayed:**
+- **FPS**: Real-time frames per second
+- **Position**: Player position coordinates
+- **Velocity**: Player movement velocity vector
+- **Camera Rotation**: Camera pitch and yaw angles
+- **Entity Count**: Number of entities in the current scene
+- **Camera Speed**: Current movement speed setting
+
+### TextRenderer
+
+The TextRenderer provides functionality for drawing text on screen:
+
+```java
+// Create text renderer
+TextRenderer textRenderer = new TextRenderer();
+
+// Render text at specific positions
+textRenderer.renderText(
+    "Debug Information",     // text to render
+    10,                     // x position (pixels)
+    10,                     // y position (pixels)
+    new Vector3f(1, 1, 1)   // color (white)
+);
+```
+
+### Visual Debug Features
+
+#### Wireframe Mode
+
+Toggle wireframe rendering to inspect mesh structure:
+
+```java
+// Toggle wireframe mode
+if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_APOSTROPHE)) {
+    wireframeMode = !wireframeMode;
+    GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, 
+        wireframeMode ? GL11.GL_LINE : GL11.GL_FILL);
+}
+```
+
+#### Free Camera Mode
+
+Use the player's free camera mode for scene inspection:
+
+```java
+// Toggle free camera for development
+if (window.isKeyPressedBuffered(GLFW.GLFW_KEY_F)) {
+    player.toggleFreeCamera();
+}
+```
 
 ## Utility Classes
 
 ### Utils
 
-General utility methods:
-- Buffer management for OpenGL
-- Resource loading
+General utility methods for the engine:
+- Buffer management for OpenGL data transfer
+- Resource loading and file handling
+- Memory management utilities
 
 ### Transformation
 
 Matrix calculations for 3D transformations:
-- Create transformation matrices for entities
-- Create view matrices for cameras
+- `createTransformationMatrix()`: Create transformation matrices for entities
+- `createViewMatrix()`: Create view matrices for cameras
+- `updateProjectionMatrix()`: Update projection matrices for rendering
 
 ### Settings
 
-Configurable engine settings:
-- Development mode flags
-- Window properties
-- Camera controls
+Configurable engine settings stored as constants:
+
+**Development Settings:**
+- `DEV`: Development mode flag (enables debug features)
+
+**Window Settings:**
+- `RESIZABLE`: Window resizability flag
+- `VSYNC`: Vertical synchronization flag
+
+**Camera Settings:**
+- `CAMERA_MOVE_SPEED`: Speed multiplier for camera movement
+- `MOUSE_SENSITIVITY`: Sensitivity multiplier for mouse movement
+- `FOV`: Field of view angle in radians
+
+**UI Settings:**
+- `UI_SCALE`: Global scale multiplier for UI elements
+
+```java
+// Example usage of settings
+if (Settings.DEV) {
+    // Enable development features
+    enableWireframeMode();
+}
+
+// Use camera settings
+float moveSpeed = Settings.CAMERA_MOVE_SPEED * deltaTime;
+```
 
 ### Consts
 
-Engine-wide constants:
-- Version information
-- Rendering constants
+Engine-wide constants for version information and rendering:
+
+**Version and Branding:**
+- `VERSION`: Engine version string ("v0.07a")
+- `AUTHOR`: Author/company name ("DiscardSoft")
+- `AUTHOR_STYLIZED`: Stylized author name ("DISCVRD")
+- `TITLE`: Engine name ("j3D")
+
+**Rendering Constants:**
+- `Z_NEAR`: Near clipping plane distance (0.001f)
+- `Z_FAR`: Far clipping plane distance (10000f)
 
 ### LoadModel
 
-Helper methods for loading 3D models:
-- Load OBJ models with textures
-- Provide primitive shapes
+Helper methods for loading 3D models and creating primitive shapes:
+- `loadOBJModel()`: Load OBJ models with textures
+- `model()`: Load predefined primitive models by name
+- Built-in primitives: "P_Cube", "P_Sphere_Medium", "P_Sphere_Small", "suzanne"
+
+```java
+// Load a built-in primitive model
+Model cubeModel = LoadModel.model("P_Cube");
+
+// Load a custom OBJ model
+Model customModel = LoadModel.loadOBJModel("/models/character.obj");
+```
 
 ## Character Controller
 
@@ -385,32 +819,57 @@ The j3D engine has several planned areas for future enhancement:
 - Scene transition system
 - Hierarchical scene graph
 - Improved entity organization
+- Dynamic loading/unloading of scenes
 
 ### Rendering Enhancements
 
-- Multiple shader support
-- Post-processing effects
-- Shadow mapping
-- Particle systems
+- Multiple shader support for different material types
+- Post-processing effects pipeline
+- Shadow mapping system
+- Instanced rendering for better performance
+- Level of Detail (LOD) system
 
 ### Physics Integration
 
-- Enhanced collision detection
-- Rigid body physics
-- Constraint systems
-- Advanced character controllers
+- Enhanced collision detection beyond simple ground collision
+- Rigid body physics system
+- Constraint systems for joints and connections
+- Advanced character controllers with slope handling
 
 ### Asset Management
 
-- Centralized resource cache
-- Asynchronous loading
-- Level loading system
+- Centralized resource cache with reference counting
+- Asynchronous loading system
+- Automatic resource optimization
+- Model and texture compression support
 
-### Entity Component System
+### User Interface Improvements
 
-- Full ECS architecture
-- Component-based entities
-- Systems for processing components
+- Layout management system
+- Animation and transition effects for UI elements
+- Rich text rendering support
+- Input focus and navigation system
+
+### Audio System
+
+- 3D positional audio
+- Audio streaming for music and large sound files
+- Audio effects and filters
+- Dynamic audio mixing
+
+### Networking Support
+
+- Client-server architecture
+- Entity synchronization
+- Network prediction and lag compensation
+- Multiplayer framework
+
+### Development Tools
+
+- In-engine scene editor
+- Real-time asset hot-reloading
+- Performance profiler
+- Visual debugging tools
 
 ## Engine Internals
 
@@ -913,11 +1372,15 @@ velocity.z = velocity.z * frameInertia + movementInput.z * MOVEMENT_SPEED;
 - **Gravity**: Downward acceleration for jumping and falling
 - **Max Velocity**: Maximum movement speed cap
 
-### Collision Detection
+### Collision Detection (Example Implementation)
+
+> **Status**: Not implemented in j3D - Example code only
 
 j3D supports several collision detection techniques:
 
-#### Bounding Volumes
+#### Bounding Volumes (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Simplified shapes that approximate the entity for faster collision detection:
 
@@ -934,7 +1397,9 @@ if (sphere.intersects(otherSphere)) {
 }
 ```
 
-#### Ray Casting
+#### Ray Casting (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Ray casting can detect collisions along a line, useful for selections and weapons:
 
@@ -954,13 +1419,19 @@ for (Entity entity : scene.getEntities()) {
 }
 ```
 
-## Audio System
+## Audio System (Example Implementation)
+
+> **Status**: Not implemented in j3D - Example code only
 
 The j3D engine includes a basic audio system for game sound effects and music.
 
-### Audio Components
+### Audio Components (Example Implementation)
 
-#### Sound Sources
+> **Status**: Not implemented - Example code only
+
+#### Sound Sources (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Sound sources represent individual sounds that can be played in the game:
 
@@ -978,7 +1449,9 @@ soundSource.play();
 soundSource.setPosition(entity.getPosition());
 ```
 
-#### Audio Listener
+#### Audio Listener (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 The audio listener represents the player's position and orientation for 3D audio:
 
@@ -988,11 +1461,13 @@ audioManager.setListenerPosition(camera.getPosition());
 audioManager.setListenerOrientation(camera.getViewDirection(), camera.getUpVector());
 ```
 
-## Terrain System
+## Terrain System (Mixed Implementation)
 
-The j3D engine provides tools for creating and rendering game terrain.
+> **Note**: j3D has a basic terrain system implemented, but the examples below show enhanced features that are not yet implemented.
 
-### Height Map Terrain
+### Height Map Terrain (Example Enhancement)
+
+> **Status**: Enhanced version - Example code only
 
 Height map terrains use a 2D grid of height values to define the surface:
 
@@ -1009,7 +1484,9 @@ Terrain terrain = new Terrain(
 scene.addTerrain(terrain);
 ```
 
-### Terrain Texturing
+### Terrain Texturing (Example Enhancement)
+
+> **Status**: Not implemented - Example code only
 
 Multiple textures can be blended on terrain based on height and slope:
 
@@ -1020,9 +1497,13 @@ terrain.addTexture("rock.png", 0.3f, 0.7f);  // mid areas
 terrain.addTexture("snow.png", 0.7f, 1.0f);  // high areas
 ```
 
-## Development Tools
+## Development Tools (Example Implementation)
 
-### Profiling and Optimization
+> **Status**: Not implemented in j3D - Example code only
+
+### Profiling and Optimization (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 The j3D engine includes tools to help optimize game performance:
 
@@ -1041,7 +1522,9 @@ float physicsTime = Profiler.getAverageTime("Physics Update");
 System.out.println("Physics update time: " + physicsTime + "ms");
 ```
 
-### Saving and Loading Game State
+### Saving and Loading Game State (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Save and restore game state for persistence between sessions:
 
@@ -1055,7 +1538,13 @@ GameState loadedState = SaveManager.loadGameState("savegame.dat");
 
 ## Advanced Development Guide
 
-### Custom Entity Creation
+For developers looking to extend j3D or add advanced features to their games.
+
+> **Important Note**: The following sections contain example implementations and theoretical code that demonstrate how various advanced features could be added to the j3D engine. These features are **not currently implemented** in the base engine and are provided as educational examples and starting points for custom development.
+
+### Custom Entity Creation (Example Implementation)
+
+> **Status**: Example code - demonstrates how to extend the existing Entity class
 
 Creating custom entity types allows you to encapsulate specific behaviors and appearance:
 
@@ -1110,7 +1599,9 @@ public class CharacterEntity extends Entity {
 }
 ```
 
-### Working with Scene Graph
+### Working with Scene Graph (Example Implementation)
+
+> **Status**: Not implemented in j3D - Example code only
 
 The scene graph system allows organizing entities in a logical hierarchy:
 
@@ -1131,7 +1622,9 @@ parent.setPosition(newPosition);  // Children move with parent
 parent.setRotation(newRotation);  // Children rotate around parent
 ```
 
-### Implementing Game State Management
+### Implementing Game State Management (Example Implementation)
+
+> **Status**: Not implemented in j3D - Example code only
 
 Game state management allows controlling the flow between different screens or modes:
 
@@ -1206,7 +1699,9 @@ public class StateManager {
 }
 ```
 
-### Advanced Input Handling
+### Advanced Input Handling (Example Implementation)
+
+> **Status**: Example code - extends the existing WindowManager input system
 
 The input system supports complex mapping for different control schemes:
 
@@ -1266,7 +1761,9 @@ public class InputMapper {
 }
 ```
 
-### Particle System Integration
+### Particle System Integration (Example Implementation)
+
+> **Status**: Not implemented in j3D - Example code only
 
 Particle systems can be implemented for effects like fire, smoke, or magic:
 
@@ -1357,7 +1854,9 @@ public class ParticleSystem {
 }
 ```
 
-### Custom Shader Effects
+### Custom Shader Effects (Example Implementation)
+
+> **Status**: Example code - extends the existing ShaderManager system
 
 Creating custom shader effects allows for unique visual styles:
 
@@ -1609,9 +2108,13 @@ public class NetworkClient {
 }
 ```
 
-## Engine Extension Guide
+## Engine Extension Guide (Example Implementations)
 
-### Creating Custom Components
+> **Status**: Not implemented in j3D - Example code only
+
+### Creating Custom Components (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 The component system can be extended to add new capabilities:
 
@@ -1697,7 +2200,9 @@ public class HealthComponent {
 }
 ```
 
-### Custom Resource Loaders
+### Custom Resource Loaders (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Custom resource loaders can be created for new asset types:
 
@@ -1765,7 +2270,9 @@ public class HeightMapLoader {
 }
 ```
 
-### Scene Serialization
+### Scene Serialization (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Scene serialization allows saving and loading scenes:
 
@@ -1867,13 +2374,19 @@ public class SceneSerializer {
 }
 ```
 
-## Performance Optimization Techniques
+## Performance Optimization Techniques (Example Implementations)
 
-### Culling Techniques
+> **Status**: Not implemented in j3D - Example code only
+
+### Culling Techniques (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Visual culling improves performance by skipping the rendering of objects not visible to the camera:
 
-#### Frustum Culling
+#### Frustum Culling (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 ```java
 /**
@@ -1905,7 +2418,9 @@ public class FrustumCuller {
 }
 ```
 
-#### Occlusion Culling
+#### Occlusion Culling (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 ```java
 /**
@@ -1939,7 +2454,9 @@ public class OcclusionCuller {
 }
 ```
 
-### Level of Detail (LOD)
+### Level of Detail (LOD) (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 LOD systems dynamically adjust model complexity based on distance:
 
@@ -1976,7 +2493,9 @@ public class LODSystem {
 }
 ```
 
-### Batch Rendering
+### Batch Rendering (Example Implementation)
+
+> **Status**: Not implemented - Example code only
 
 Batch rendering reduces draw calls by combining similar objects:
 

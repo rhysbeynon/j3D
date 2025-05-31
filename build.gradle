@@ -53,6 +53,9 @@ project.ext.jomlPrimVersion = "1.10.8"
 dependencies {
     implementation "org.joml:joml:${jomlVersion}"
     implementation "org.joml:joml:${jomlVersion}"
+    
+    // JSON serialization for level files
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
@@ -74,6 +77,62 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// Custom task to run jEDIT Level Editor
+task runJEdit(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.discardsoft.j3D.tools.jEdit.JEditMain'
+    
+    // Common settings
+    standardInput = System.in
+    standardOutput = System.out
+    errorOutput = System.err
+    
+    // Add macOS-specific JVM arguments
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+        // This is needed for LWJGL but may interfere with Swing on macOS
+        // jvmArgs '-XstartOnFirstThread'
+        
+        // These are for macOS Swing/AWT applications
+        systemProperty 'apple.awt.UIElement', 'false'
+        systemProperty 'java.awt.headless', 'false'
+        systemProperty 'awt.toolkit', 'sun.lwawt.macosx.LWCToolkit'
+    }
+}
+
+// Custom task to run jEDIT Level Editor through the launcher
+task runJEditLauncher(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.discardsoft.j3D.tools.jEdit.JEditLauncher'
+    
+    // Common settings
+    standardInput = System.in
+    standardOutput = System.out
+    errorOutput = System.err
+    
+    // Add macOS-specific properties
+    systemProperty 'apple.awt.UIElement', 'false'
+    systemProperty 'java.awt.headless', 'false'
+    
+    doFirst {
+        println "Running jEDIT through the launcher..."
+    }
+}
+
+// Simple launcher task with minimal dependencies
+task runSimpleJEdit(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.discardsoft.j3D.tools.jEdit.SimpleJEditLauncher'
+    
+    // Common settings
+    standardInput = System.in
+    standardOutput = System.out
+    errorOutput = System.err
+    
+    doFirst {
+        println "Running simple jEDIT launcher..."
+    }
 }
 
 repositories {

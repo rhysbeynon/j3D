@@ -1,9 +1,8 @@
 package com.discardsoft.j3D.core.utils;
 
 import com.discardsoft.j3D.core.entity.Camera;
-import com.discardsoft.j3D.core.entity.Entity;
 import com.discardsoft.j3D.core.entity.Player;
-import com.discardsoft.j3D.core.scene.TestScene;
+import com.discardsoft.j3D.core.scene.BaseScene;
 import org.joml.Vector3f;
 
 /**
@@ -39,10 +38,10 @@ public class DebugHUD {
      * @param fps Current frames per second
      * @param player The player entity
      * @param scene The current game scene
-     * @deprecated Use {@link #render(int, Player, TestScene, float)} instead
+     * @deprecated Use {@link #render(int, Player, BaseScene, float)} instead
      */
     @Deprecated
-    public void render(int fps, Player player, TestScene scene) {
+    public void render(int fps, Player player, BaseScene scene) {
         render(fps, player, scene, Settings.CAMERA_MOVE_SPEED);
     }
     
@@ -54,7 +53,7 @@ public class DebugHUD {
      * @param scene The current game scene
      * @param cameraMoveSpeed Current camera movement speed
      */
-    public void render(int fps, Player player, TestScene scene, float cameraMoveSpeed) {
+    public void render(int fps, Player player, BaseScene scene, float cameraMoveSpeed) {
         StringBuilder debugInfo = new StringBuilder();
         
         // Game information

@@ -52,6 +52,11 @@ public interface IScene {
     void removeEntity(Entity entity);
     
     /**
+     * Removes all entities from the scene.
+     */
+    void clearEntities();
+    
+    /**
      * Gets all entities in the scene.
      *
      * @return An unmodifiable list of all entities

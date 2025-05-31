@@ -43,13 +43,13 @@ package com.discardsoft.j3D.game;
 import com.discardsoft.j3D.Main;
 import com.discardsoft.j3D.core.*;
 import com.discardsoft.j3D.core.entity.Camera;
-import com.discardsoft.j3D.core.scene.GameScene;
+import com.discardsoft.j3D.core.scene.TestScene;
 
 public class MyGame implements IGameLogic {
     private final RenderManager renderer;
     private final ObjectLoader loader;
     private final WindowManager window;
-    private GameScene scene;
+    private TestScene scene;
     private Camera camera;
 
     public MyGame() {
@@ -62,7 +62,7 @@ public class MyGame implements IGameLogic {
     @Override
     public void init() throws Exception {
         renderer.init();
-        scene = new GameScene();
+        scene = new TestScene();
         scene.initialize();
     }
 
@@ -122,7 +122,7 @@ Create a new scene class:
 ```java
 package com.discardsoft.j3D.game;
 
-import com.discardsoft.j3D.core.scene.TestScene;
+import com.discardsoft.j3D.core.scene.BaseScene;
 import com.discardsoft.j3D.core.entity.*;
 import com.discardsoft.j3D.core.utils.LoadModel;
 import org.joml.Vector3f;
@@ -209,7 +209,7 @@ public void update() {
         cameraInc.z * moveSpeed
     );
     
-    scene.update(deltaTime);
+    scene.update(0.016f); // Use actual deltaTime in real implementation
 }
 ```
 
