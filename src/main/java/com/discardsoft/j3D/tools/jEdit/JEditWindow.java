@@ -315,7 +315,10 @@ public class JEditWindow extends JFrame {
     
     private void exitApplication() {
         if (!confirmDiscardChanges()) return;
-        System.exit(0);
+        
+        // Dispose the window instead of calling System.exit(0)
+        // This allows the launcher to detect the window closing and restore itself
+        dispose();
     }
     
     // Edit operations

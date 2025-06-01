@@ -2,41 +2,9 @@
   "metadata": {
     "name": "Test Level",
     "description": "A test level converted from TestScene with terrain and a rotating Suzanne model",
-    "version": "1.0.0",
     "author": "DiscardSoft",
-    "created_date": "2025-05-31T00:00:00Z",
-    "last_modified": "2025-05-31T00:00:00Z",
-    "engine_version": "0.0.7"
-  },
-  "lighting": {
-    "position": {
-      "x": 30.0,
-      "y": 50.0,
-      "z": 30.0
-    },
-    "color": {
-      "r": 1.0,
-      "g": 1.0,
-      "b": 1.0
-    },
-    "ambient": {
-      "r": 0.3,
-      "g": 0.3,
-      "b": 0.3
-    }
-  },
-  "terrain": {
-    "enabled": true,
-    "size": 512.0,
-    "grid_count": 64,
-    "height": 0.0,
-    "position": {
-      "x": -256.0,
-      "y": 0.0,
-      "z": -256.0
-    },
-    "texture": "ground2.png",
-    "texture_repeat": 64.0
+    "version": "1.0",
+    "created": "2025-06-01T07:20:13.115188Z"
   },
   "entities": [
     {
@@ -44,9 +12,9 @@
       "name": "Suzanne Monkey Head",
       "model": "suzanne",
       "position": {
-        "x": 0.0,
+        "x": -6.1999965,
         "y": 1.0,
-        "z": -5.0
+        "z": -5.1
       },
       "rotation": {
         "x": 0.0,
@@ -57,27 +25,6 @@
         "x": 1.0,
         "y": 1.0,
         "z": 1.0
-      },
-      "properties": {
-        "animated": true,
-        "rotation_speed": 45.0
-      },
-      "tags": ["demo", "animated", "model"]
-    }
-  ],
-  "spawns": [
-    {
-      "id": "default_spawn",
-      "name": "Default Spawn Point",
-      "position": {
-        "x": 0.0,
-        "y": 2.0,
-        "z": 0.0
-      },
-      "rotation": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
       }
     }
   ]

@@ -20,7 +20,7 @@ import java.net.URI;
  */
 public class JLaunchWindow extends JFrame {
     
-    private static final String TITLE = "jLAUNCH - j3D Project Launcher";
+    private static final String TITLE = "j3D";
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 400;
     
@@ -106,9 +106,9 @@ public class JLaunchWindow extends JFrame {
         centerPanel.add(j3dButton, gbc);
         
         // jEDIT Editor button
-        JButton jeditButton = createMainButton("Launch jEDIT Editor", this::launchJEdit);
+        JButton jEditButton = createMainButton("Launch jEDIT Editor", this::launchJEDIT);
         gbc.gridy = 1;
-        centerPanel.add(jeditButton, gbc);
+        centerPanel.add(jEditButton, gbc);
         
         return centerPanel;
     }
@@ -165,16 +165,46 @@ public class JLaunchWindow extends JFrame {
     }
     
     /**
-     * Launches the j3D Engine.
+     * Launches the j3D Engine as a separate JVM process.
+     * This is required on macOS to properly handle the -XstartOnFirstThread argument for OpenGL.
      */
     private void launchJ3D(ActionEvent e) {
         try {
             System.out.println("Launching j3D Engine...");
             
-            // Create and start j3D in a separate thread
+            // Launch j3D as a separate JVM process with proper OpenGL arguments
             Thread j3dThread = new Thread(() -> {
                 try {
-                    com.discardsoft.j3D.Main.main(new String[]{});
+                    // Get the current Java executable path
+                    String javaHome = System.getProperty("java.home");
+                    String javaBin = javaHome + "/bin/java";
+                    
+                    // Get the classpath from current JVM
+                    String classpath = System.getProperty("java.class.path");
+                    
+                    // Build the command with proper JVM arguments for macOS OpenGL
+                    ProcessBuilder pb = new ProcessBuilder();
+                    pb.command(javaBin,
+                        "-XstartOnFirstThread",              // Required for OpenGL on macOS
+                        "-Djava.awt.headless=false",         // Ensure GUI is enabled
+                        "-cp", classpath,                    // Use current classpath
+                        "com.discardsoft.j3D.Main"          // Main class to launch
+                    );
+                    
+                    // Start the process
+                    Process process = pb.start();
+                    
+                    // Monitor process in background
+                    int exitCode = process.waitFor();
+                    if (exitCode != 0) {
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(this,
+                                "j3D Engine exited with code: " + exitCode,
+                                "j3D Engine Exit",
+                                JOptionPane.WARNING_MESSAGE);
+                        });
+                    }
+                    
                 } catch (Exception ex) {
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(this,
@@ -202,15 +232,55 @@ public class JLaunchWindow extends JFrame {
     
     /**
      * Launches the jEDIT Level Editor.
+     * When jEDIT is closed, the launcher will be restored.
      */
-    private void launchJEdit(ActionEvent e) {
+    private void launchJEDIT(ActionEvent e) {
         try {
             System.out.println("Launching jEDIT Editor...");
             
             // Create and start jEDIT in a separate thread
-            Thread jeditThread = new Thread(() -> {
+            Thread jEditThread = new Thread(() -> {
                 try {
-                    com.discardsoft.j3D.tools.jEdit.SimpleJEditLauncher.main(new String[]{});
+                    // Create a callback to restore the launcher when jEDIT closes
+                    Runnable onJEditClosed = () -> {
+                        SwingUtilities.invokeLater(() -> {
+                            // Restore the launcher window
+                            setState(JFrame.NORMAL);
+                            toFront();
+                            requestFocus();
+                            System.out.println("jEDIT closed - launcher restored");
+                        });
+                    };
+                    
+                    // Create the jEDIT window with our callback
+                    SwingUtilities.invokeAndWait(() -> {
+                        try {
+                            System.out.println("Creating jEDIT window...");
+                            com.discardsoft.j3D.tools.jEdit.JEditWindow editor = 
+                                new com.discardsoft.j3D.tools.jEdit.JEditWindow();
+                            
+                            // Set up a window listener to detect when jEDIT is closed
+                            editor.addWindowListener(new java.awt.event.WindowAdapter() {
+                                @Override
+                                public void windowClosed(java.awt.event.WindowEvent e) {
+                                    onJEditClosed.run();
+                                }
+                            });
+                            
+                            System.out.println("Setting jEDIT window visible...");
+                            editor.setVisible(true);
+                            System.out.println("jEDIT window should now be visible");
+                        } catch (Exception ex) {
+                            SwingUtilities.invokeLater(() -> {
+                                JOptionPane.showMessageDialog(this,
+                                    "Failed to launch jEDIT Editor: " + ex.getMessage(),
+                                    "Launch Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            });
+                            ex.printStackTrace();
+                        }
+                    });
+                    
                 } catch (Exception ex) {
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(this,
@@ -221,8 +291,8 @@ public class JLaunchWindow extends JFrame {
                     ex.printStackTrace();
                 }
             });
-            jeditThread.setDaemon(true);
-            jeditThread.start();
+            jEditThread.setDaemon(true);
+            jEditThread.start();
             
             // Minimize launcher window
             setState(JFrame.ICONIFIED);

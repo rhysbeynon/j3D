@@ -20,7 +20,7 @@ public class SimpleJEditLauncher {
             // Create and show the editor window on the EDT
             SwingUtilities.invokeLater(() -> {
                 try {
-                    System.out.println("Creating JEditWindow...");
+                    System.out.println("Creating jEDIT window...");
                     JEditWindow editor = new JEditWindow();
                     System.out.println("Setting window visible...");
                     editor.setVisible(true);

@@ -23,6 +23,26 @@ j3D is a lightweight, Java-based 3D game engine built with LWJGL and OpenGL.
 - System that supports OpenGL (most of them)
 - Gradle
 
+## Getting Started
+
+### Quick Start
+To launch the j3D application suite:
+
+```bash
+# Using Gradle (recommended)
+./gradlew run
+
+# Using the shell script
+./launch_j3d.sh
+```
+
+The launcher provides access to:
+- **j3D Engine**: The main 3D game engine
+- **jEDIT Level Editor**: 2D level editor for creating 3D levels
+
+### macOS Users
+The launcher automatically handles the required `-XstartOnFirstThread` JVM argument for proper OpenGL context creation on macOS.
+
 ## Project Structure
 
 - `src/main/java/com/discardsoft/j3D/` - Core engine and game logic
