@@ -182,6 +182,9 @@ public class JLaunchWindow extends JFrame {
                     // Get the classpath from current JVM
                     String classpath = System.getProperty("java.class.path");
                     
+                    System.out.println("DEBUG: Java binary: " + javaBin);
+                    System.out.println("DEBUG: Classpath: " + classpath);
+                    
                     // Build the command with proper JVM arguments for macOS OpenGL
                     ProcessBuilder pb = new ProcessBuilder();
                     pb.command(javaBin,
@@ -191,19 +194,41 @@ public class JLaunchWindow extends JFrame {
                         "com.discardsoft.j3D.Main"          // Main class to launch
                     );
                     
+                    System.out.println("DEBUG: Command to execute: " + pb.command());
+                    
+                    // Redirect error stream to see any errors
+                    pb.redirectErrorStream(true);
+                    
                     // Start the process
                     Process process = pb.start();
                     
+                    // Read and print the output to see what's happening
+                    java.io.BufferedReader reader = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(process.getInputStream()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println("j3D Output: " + line);
+                    }
+                    
                     // Monitor process in background
                     int exitCode = process.waitFor();
-                    if (exitCode != 0) {
-                        SwingUtilities.invokeLater(() -> {
+                    System.out.println("DEBUG: j3D process exited with code: " + exitCode);
+                    
+                    // Restore the launcher window when j3D exits
+                    SwingUtilities.invokeLater(() -> {
+                        setState(JFrame.NORMAL);
+                        toFront();
+                        requestFocus();
+                        System.out.println("j3D Engine closed - launcher restored");
+                        
+                        // Show error message only if j3D exited with an error code
+                        if (exitCode != 0) {
                             JOptionPane.showMessageDialog(this,
                                 "j3D Engine exited with code: " + exitCode,
                                 "j3D Engine Exit",
                                 JOptionPane.WARNING_MESSAGE);
-                        });
-                    }
+                        }
+                    });
                     
                 } catch (Exception ex) {
                     SwingUtilities.invokeLater(() -> {
