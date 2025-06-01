@@ -4,7 +4,7 @@ plugins {
 }
 
 application {
-    mainClass = 'com.discardsoft.j3D.Main'
+    mainClass = 'com.discardsoft.j3D.launcher.JLaunchMain'
     
     // Add macOS-specific JVM arguments
     if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
@@ -77,6 +77,26 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// Custom task to run j3D Engine directly
+task runJ3D(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.discardsoft.j3D.Main'
+    
+    // Common settings
+    standardInput = System.in
+    standardOutput = System.out
+    errorOutput = System.err
+    
+    // Add macOS-specific JVM arguments
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+        jvmArgs '-XstartOnFirstThread'
+    }
+    
+    doFirst {
+        println "Running j3D Engine directly..."
+    }
 }
 
 // Custom task to run jEDIT Level Editor
