@@ -10,12 +10,12 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 /**
- * Main window for the jEDIT level editor.
+ * Main window for jEDIT level editor.
  * 
  * This class creates and manages the main editor interface including:
- * - Menu bar with file operations
- * - Toolbar with common tools
- * - 2D viewport with grid and entity representations
+ * - Menu bar integration with file operations
+ * - Toolbar with common tools (more to come)
+ * - 2D viewport with primitive grid and entity representations
  * - View switching (top, side, front)
  * - Zoom and pan controls
  */
@@ -323,12 +323,12 @@ public class JEditWindow extends JFrame {
     
     // Edit operations
     private void undo() {
-        // TODO: Implement undo functionality
+        // TODO: implement undo functionality
         statusPanel.setStatus("Undo not yet implemented");
     }
     
     private void redo() {
-        // TODO: Implement redo functionality
+        // TODO: implement redo functionality
         statusPanel.setStatus("Redo not yet implemented");
     }
     

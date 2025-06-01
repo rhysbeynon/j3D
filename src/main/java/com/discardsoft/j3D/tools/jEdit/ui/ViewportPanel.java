@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class ViewportPanel extends JPanel {
     
-    private static final Color BACKGROUND_COLOR = Color.WHITE;
+    private static final Color BACKGROUND_COLOR = Color.BLUE;
     private static final Color GRID_COLOR = new Color(220, 220, 220);
     private static final Color ENTITY_COLOR = Color.BLACK;
     private static final Color SELECTED_COLOR = Color.BLUE;
