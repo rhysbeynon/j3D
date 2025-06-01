@@ -9,6 +9,7 @@ import com.discardsoft.j3D.core.entity.Player;
 import com.discardsoft.j3D.core.scene.TestScene;
 import com.discardsoft.j3D.core.utils.DebugHUD;
 import com.discardsoft.j3D.core.utils.Settings;
+import com.discardsoft.j3D.core.scene.BaseScene;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -20,6 +21,7 @@ import com.discardsoft.j3D.core.ui.PauseMenu;
 
 // Add the level loading imports
 import com.discardsoft.j3D.core.level.LevelLoader;
+import com.discardsoft.j3D.core.level.LevelLoader.LoadedLevel;
 
 /**
  * Test implementation of game logic.
@@ -73,7 +75,7 @@ public class TestGame implements IGameLogic {
     private final WindowManager window;
 
     /** The test scene containing all game entities */
-    private TestScene scene;
+    private BaseScene scene;
     
     /** The player entity */
     private Player player;
@@ -113,23 +115,41 @@ public class TestGame implements IGameLogic {
         renderer.init();
         
         // Load the scene from j3dl file instead of creating a hardcoded TestScene
-        LevelLoader levelLoader = new LevelLoader(loader);
-        String levelPath = "src/main/resources/levels/test_level.j3dl";
-        LevelLoader.LoadedLevel loadedLevel = levelLoader.loadLevel(levelPath);
-        
-        // Set the loaded scene
-        scene = loadedLevel.scene;
-        
-        // Create player at default spawn point (or at origin if no spawn points defined)
-        Vector3f playerPos = new Vector3f(0.0f, 0.0f, 0.0f);
-        if (loadedLevel.spawns != null && !loadedLevel.spawns.isEmpty()) {
-            // Use the first spawn point
-            playerPos = loadedLevel.spawns.get(0).position;
+        try {
+            LevelLoader levelLoader = new LevelLoader(loader);
+            // Use classpath resource path instead of filesystem path
+            LoadedLevel loadedLevel = levelLoader.loadLevel("/levels/test_level.j3dl");
+            
+            // Set the loaded scene
+            scene = loadedLevel.scene;
+            
+            System.out.println("Successfully loaded level: " + loadedLevel.metadata.name);
+            System.out.println("Description: " + loadedLevel.metadata.description);
+            
+            // Create player at default spawn point (or at origin if no spawn points defined)
+            Vector3f playerPos = new Vector3f(0.0f, 1.5f, 0.0f); // Start slightly above ground
+            if (loadedLevel.spawns != null && !loadedLevel.spawns.isEmpty()) {
+                // Use the first spawn point
+                playerPos = loadedLevel.spawns.get(0).position;
+                System.out.println("Using spawn point: " + playerPos);
+            }
+            player = new Player(playerPos);
+            
+            // Add player's bounding entity to the scene
+            scene.addEntity(player.getBoundingEntity());
+            
+        } catch (Exception e) {
+            System.err.println("Failed to load default level from /levels/test_level.j3dl: " + e.getMessage());
+            System.err.println("Falling back to TestScene...");
+            
+            // Fallback to TestScene if level loading fails
+            scene = new TestScene();
+            scene.initialize();
+            
+            // Create player at default position
+            player = new Player(new Vector3f(0.0f, 1.5f, 0.0f));
+            scene.addEntity(player.getBoundingEntity());
         }
-        player = new Player(playerPos);
-        
-        // Add player's bounding entity to the scene
-        scene.addEntity(player.getBoundingEntity());
         
         // Initialize debug HUD
         debugHUD = new DebugHUD(window.getWidth(), window.getHeight());
@@ -615,8 +635,8 @@ public class TestGame implements IGameLogic {
      * Creates a LoadedLevel instance from the current scene state.
      * This is used for saving the current level.
      */
-    private LevelLoader.LoadedLevel createLoadedLevelFromScene() {
-        LevelLoader.LoadedLevel level = new LevelLoader.LoadedLevel();
+    private LoadedLevel createLoadedLevelFromScene() {
+        LoadedLevel level = new LoadedLevel();
         
         // Create metadata
         level.metadata = new LevelLoader.LevelMetadata();
