@@ -29,6 +29,15 @@ public class PropertiesPanel extends JPanel {
     private JTextArea levelDescField;
     private JTextField authorField;
     
+    // Terrain properties
+    private JCheckBox terrainEnabledCheckBox;
+    private JSpinner terrainSizeSpinner;
+    private JSpinner terrainGridCountSpinner;
+    private JSpinner terrainHeightSpinner;
+    private JSpinner terrainPosXSpinner, terrainPosYSpinner, terrainPosZSpinner;
+    private JTextField terrainTextureField;
+    private JSpinner terrainTextureRepeatSpinner;
+    
     public PropertiesPanel(LevelModel levelModel) {
         this.levelModel = levelModel;
         
@@ -51,6 +60,10 @@ public class PropertiesPanel extends JPanel {
         // Level properties tab
         JPanel levelPanel = createLevelPropertiesPanel();
         tabs.addTab("Level", levelPanel);
+        
+        // Terrain properties tab
+        JPanel terrainPanel = createTerrainPropertiesPanel();
+        tabs.addTab("Terrain", terrainPanel);
         
         add(tabs, BorderLayout.CENTER);
     }
@@ -176,6 +189,84 @@ public class PropertiesPanel extends JPanel {
         return panel;
     }
     
+    private JPanel createTerrainPropertiesPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        // Terrain Enable/Disable
+        JPanel enablePanel = new JPanel(new GridBagLayout());
+        enablePanel.setBorder(new TitledBorder("Terrain Settings"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+        
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
+        terrainEnabledCheckBox = new JCheckBox("Enable Terrain");
+        enablePanel.add(terrainEnabledCheckBox, gbc);
+        
+        panel.add(enablePanel);
+        
+        // Terrain Properties
+        JPanel propsPanel = new JPanel(new GridBagLayout());
+        propsPanel.setBorder(new TitledBorder("Terrain Properties"));
+        
+        // Size
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        propsPanel.add(new JLabel("Size:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        terrainSizeSpinner = createFloatSpinner(1.0, 10000.0, 1.0);
+        propsPanel.add(terrainSizeSpinner, gbc);
+        
+        // Grid Count
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        propsPanel.add(new JLabel("Grid Count:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        terrainGridCountSpinner = new JSpinner(new SpinnerNumberModel(64, 4, 512, 1));
+        propsPanel.add(terrainGridCountSpinner, gbc);
+        
+        // Height
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        propsPanel.add(new JLabel("Height:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        terrainHeightSpinner = createFloatSpinner(-1000.0, 1000.0, 0.1);
+        propsPanel.add(terrainHeightSpinner, gbc);
+        
+        // Position
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        propsPanel.add(new JLabel("Position:"), gbc);
+        
+        JPanel posPanel = new JPanel(new GridLayout(1, 3, 2, 0));
+        terrainPosXSpinner = createFloatSpinner(-10000.0, 10000.0, 1.0);
+        terrainPosYSpinner = createFloatSpinner(-10000.0, 10000.0, 1.0);
+        terrainPosZSpinner = createFloatSpinner(-10000.0, 10000.0, 1.0);
+        posPanel.add(terrainPosXSpinner);
+        posPanel.add(terrainPosYSpinner);
+        posPanel.add(terrainPosZSpinner);
+        
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        propsPanel.add(posPanel, gbc);
+        
+        // Texture
+        gbc.gridx = 0; gbc.gridy = 4; gbc.anchor = GridBagConstraints.WEST; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        propsPanel.add(new JLabel("Texture:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        terrainTextureField = new JTextField();
+        propsPanel.add(terrainTextureField, gbc);
+        
+        // Texture Repeat
+        gbc.gridx = 0; gbc.gridy = 5; gbc.anchor = GridBagConstraints.WEST; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+        propsPanel.add(new JLabel("Texture Repeat:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        terrainTextureRepeatSpinner = createFloatSpinner(0.1, 1000.0, 1.0);
+        propsPanel.add(terrainTextureRepeatSpinner, gbc);
+        
+        panel.add(propsPanel);
+        
+        // Add some spacing
+        panel.add(Box.createVerticalGlue());
+        
+        return panel;
+    }
+
     private JSpinner createFloatSpinner(double min, double max, double step) {
         // Ensure the default value is within min-max range
         double defaultValue = 0.0;
@@ -219,6 +310,17 @@ public class PropertiesPanel extends JPanel {
                 updateLevelFromFields(null);
             }
         });
+        
+        // Terrain property change handlers
+        terrainEnabledCheckBox.addActionListener(this::updateTerrainFromFields);
+        terrainSizeSpinner.addChangeListener(e -> updateTerrainFromFields(null));
+        terrainGridCountSpinner.addChangeListener(e -> updateTerrainFromFields(null));
+        terrainHeightSpinner.addChangeListener(e -> updateTerrainFromFields(null));
+        terrainPosXSpinner.addChangeListener(e -> updateTerrainFromFields(null));
+        terrainPosYSpinner.addChangeListener(e -> updateTerrainFromFields(null));
+        terrainPosZSpinner.addChangeListener(e -> updateTerrainFromFields(null));
+        terrainTextureField.addActionListener(this::updateTerrainFromFields);
+        terrainTextureRepeatSpinner.addChangeListener(e -> updateTerrainFromFields(null));
         
         // Listen for selection changes
         levelModel.addChangeListener(e -> updateFromSelection());
@@ -264,6 +366,25 @@ public class PropertiesPanel extends JPanel {
         levelModel.setLevelName(levelNameField.getText());
         levelModel.setAuthor(authorField.getText());
         levelModel.setLevelDescription(levelDescField.getText());
+    }
+    
+    private void updateTerrainFromFields(ActionEvent e) {
+        if (updating) return;
+        
+        levelModel.setTerrainEnabled(terrainEnabledCheckBox.isSelected());
+        levelModel.setTerrainSize(((Number) terrainSizeSpinner.getValue()).floatValue());
+        levelModel.setTerrainGridCount(((Number) terrainGridCountSpinner.getValue()).intValue());
+        levelModel.setTerrainHeight(((Number) terrainHeightSpinner.getValue()).floatValue());
+        
+        Vector3f position = new Vector3f(
+            ((Number) terrainPosXSpinner.getValue()).floatValue(),
+            ((Number) terrainPosYSpinner.getValue()).floatValue(),
+            ((Number) terrainPosZSpinner.getValue()).floatValue()
+        );
+        levelModel.setTerrainPosition(position);
+        
+        levelModel.setTerrainTexture(terrainTextureField.getText());
+        levelModel.setTerrainTextureRepeat(((Number) terrainTextureRepeatSpinner.getValue()).floatValue());
     }
     
     private void updateFromSelection() {
@@ -323,6 +444,20 @@ public class PropertiesPanel extends JPanel {
         levelNameField.setText(levelModel.getLevelName());
         authorField.setText(levelModel.getAuthor());
         levelDescField.setText(levelModel.getLevelDescription());
+        
+        // Update terrain properties
+        terrainEnabledCheckBox.setSelected(levelModel.isTerrainEnabled());
+        terrainSizeSpinner.setValue((double) levelModel.getTerrainSize());
+        terrainGridCountSpinner.setValue(levelModel.getTerrainGridCount());
+        terrainHeightSpinner.setValue((double) levelModel.getTerrainHeight());
+        
+        Vector3f terrainPos = levelModel.getTerrainPosition();
+        terrainPosXSpinner.setValue((double) terrainPos.x);
+        terrainPosYSpinner.setValue((double) terrainPos.y);
+        terrainPosZSpinner.setValue((double) terrainPos.z);
+        
+        terrainTextureField.setText(levelModel.getTerrainTexture());
+        terrainTextureRepeatSpinner.setValue((double) levelModel.getTerrainTextureRepeat());
         
         updating = false;
     }

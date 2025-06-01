@@ -4,7 +4,7 @@
     "description": "A test level converted from TestScene with terrain and a rotating Suzanne model",
     "author": "DiscardSoft",
     "version": "1.0",
-    "created": "2025-06-01T07:20:13.115188Z"
+    "created": "2025-06-01T10:21:28.309014Z"
   },
   "entities": [
     {
@@ -12,9 +12,9 @@
       "name": "Suzanne Monkey Head",
       "model": "suzanne",
       "position": {
-        "x": -6.1999965,
+        "x": -3.9999924,
         "y": 1.0,
-        "z": -5.1
+        "z": -6.699999
       },
       "rotation": {
         "x": 0.0,
@@ -27,5 +27,18 @@
         "z": 1.0
       }
     }
-  ]
+  ],
+  "terrain": {
+    "enabled": true,
+    "size": 512.0,
+    "gridCount": 64,
+    "height": 0.0,
+    "position": {
+      "x": -256.0,
+      "y": 0.0,
+      "z": -256.0
+    },
+    "texture": "ground2",
+    "textureRepeat": 64.0
+  }
 }

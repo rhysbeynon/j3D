@@ -34,6 +34,15 @@ public class LevelModel {
     private String levelDescription;
     private String author;
     
+    // Terrain properties
+    private boolean terrainEnabled;
+    private float terrainSize;
+    private int terrainGridCount;
+    private float terrainHeight;
+    private Vector3f terrainPosition;
+    private String terrainTexture;
+    private float terrainTextureRepeat;
+    
     public LevelModel() {
         this.entities = new ArrayList<>();
         this.selectedEntities = new ArrayList<>();
@@ -44,6 +53,15 @@ public class LevelModel {
         this.levelName = "Untitled Level";
         this.levelDescription = "";
         this.author = System.getProperty("user.name", "Unknown");
+        
+        // Default terrain properties
+        this.terrainEnabled = true;
+        this.terrainSize = 512.0f;
+        this.terrainGridCount = 64;
+        this.terrainHeight = 0.0f;
+        this.terrainPosition = new Vector3f(-256.0f, 0.0f, -256.0f);
+        this.terrainTexture = "ground2";
+        this.terrainTextureRepeat = 64.0f;
     }
     
     /**
@@ -207,6 +225,25 @@ public class LevelModel {
         }
         levelData.add("entities", entitiesArray);
         
+        // Terrain data
+        JsonObject terrain = new JsonObject();
+        terrain.addProperty("enabled", terrainEnabled);
+        if (terrainEnabled) {
+            terrain.addProperty("size", terrainSize);
+            terrain.addProperty("gridCount", terrainGridCount);
+            terrain.addProperty("height", terrainHeight);
+            
+            JsonObject terrainPos = new JsonObject();
+            terrainPos.addProperty("x", terrainPosition.x);
+            terrainPos.addProperty("y", terrainPosition.y);
+            terrainPos.addProperty("z", terrainPosition.z);
+            terrain.add("position", terrainPos);
+            
+            terrain.addProperty("texture", terrainTexture);
+            terrain.addProperty("textureRepeat", terrainTextureRepeat);
+        }
+        levelData.add("terrain", terrain);
+        
         // Write to file
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(levelData, writer);
@@ -273,6 +310,31 @@ public class LevelModel {
                     }
                     
                     entities.add(entity);
+                }
+            }
+            
+            // Load terrain
+            if (levelData.has("terrain")) {
+                JsonObject terrainData = levelData.getAsJsonObject("terrain");
+                if (terrainData.has("enabled") && terrainData.get("enabled").getAsBoolean()) {
+                    terrainEnabled = true;
+                    terrainSize = terrainData.has("size") ? terrainData.get("size").getAsFloat() : 512.0f;
+                    terrainGridCount = terrainData.has("gridCount") ? terrainData.get("gridCount").getAsInt() : 64;
+                    terrainHeight = terrainData.has("height") ? terrainData.get("height").getAsFloat() : 0.0f;
+                    
+                    if (terrainData.has("position")) {
+                        JsonObject pos = terrainData.getAsJsonObject("position");
+                        terrainPosition.set(
+                            pos.get("x").getAsFloat(),
+                            pos.get("y").getAsFloat(),
+                            pos.get("z").getAsFloat()
+                        );
+                    }
+                    
+                    terrainTexture = terrainData.has("texture") ? terrainData.get("texture").getAsString() : "ground2";
+                    terrainTextureRepeat = terrainData.has("textureRepeat") ? terrainData.get("textureRepeat").getAsFloat() : 64.0f;
+                } else {
+                    terrainEnabled = false;
                 }
             }
             
@@ -345,9 +407,23 @@ public class LevelModel {
         lighting.add("ambient", ambientColor);
         levelData.add("lighting", lighting);
         
-        // Terrain (disabled)
+        // Terrain (using terrain properties)
         JsonObject terrain = new JsonObject();
-        terrain.addProperty("enabled", false);
+        terrain.addProperty("enabled", terrainEnabled);
+        if (terrainEnabled) {
+            terrain.addProperty("size", terrainSize);
+            terrain.addProperty("gridCount", terrainGridCount);
+            terrain.addProperty("height", terrainHeight);
+            
+            JsonObject terrainPos = new JsonObject();
+            terrainPos.addProperty("x", terrainPosition.x);
+            terrainPos.addProperty("y", terrainPosition.y);
+            terrainPos.addProperty("z", terrainPosition.z);
+            terrain.add("position", terrainPos);
+            
+            terrain.addProperty("texture", terrainTexture);
+            terrain.addProperty("textureRepeat", terrainTextureRepeat);
+        }
         levelData.add("terrain", terrain);
         
         // Entities
@@ -462,6 +538,31 @@ public class LevelModel {
                 }
             }
             
+            // Load terrain
+            if (levelData.has("terrain")) {
+                JsonObject terrainData = levelData.getAsJsonObject("terrain");
+                if (terrainData.has("enabled") && terrainData.get("enabled").getAsBoolean()) {
+                    terrainEnabled = true;
+                    terrainSize = terrainData.has("size") ? terrainData.get("size").getAsFloat() : 512.0f;
+                    terrainGridCount = terrainData.has("gridCount") ? terrainData.get("gridCount").getAsInt() : 64;
+                    terrainHeight = terrainData.has("height") ? terrainData.get("height").getAsFloat() : 0.0f;
+                    
+                    if (terrainData.has("position")) {
+                        JsonObject pos = terrainData.getAsJsonObject("position");
+                        terrainPosition.set(
+                            pos.get("x").getAsFloat(),
+                            pos.get("y").getAsFloat(),
+                            pos.get("z").getAsFloat()
+                        );
+                    }
+                    
+                    terrainTexture = terrainData.has("texture") ? terrainData.get("texture").getAsString() : "ground2";
+                    terrainTextureRepeat = terrainData.has("textureRepeat") ? terrainData.get("textureRepeat").getAsFloat() : 64.0f;
+                } else {
+                    terrainEnabled = false;
+                }
+            }
+            
             fireChangeEvent();
         }
     }
@@ -498,6 +599,49 @@ public class LevelModel {
     public String getAuthor() { return author; }
     public void setAuthor(String author) { 
         this.author = author;
+        fireChangeEvent();
+    }
+    
+    // Getters and setters for terrain properties
+    public boolean isTerrainEnabled() { return terrainEnabled; }
+    public void setTerrainEnabled(boolean terrainEnabled) {
+        this.terrainEnabled = terrainEnabled;
+        fireChangeEvent();
+    }
+    
+    public float getTerrainSize() { return terrainSize; }
+    public void setTerrainSize(float terrainSize) {
+        this.terrainSize = terrainSize;
+        fireChangeEvent();
+    }
+    
+    public int getTerrainGridCount() { return terrainGridCount; }
+    public void setTerrainGridCount(int terrainGridCount) {
+        this.terrainGridCount = terrainGridCount;
+        fireChangeEvent();
+    }
+    
+    public float getTerrainHeight() { return terrainHeight; }
+    public void setTerrainHeight(float terrainHeight) {
+        this.terrainHeight = terrainHeight;
+        fireChangeEvent();
+    }
+    
+    public Vector3f getTerrainPosition() { return new Vector3f(terrainPosition); }
+    public void setTerrainPosition(Vector3f terrainPosition) {
+        this.terrainPosition.set(terrainPosition);
+        fireChangeEvent();
+    }
+    
+    public String getTerrainTexture() { return terrainTexture; }
+    public void setTerrainTexture(String terrainTexture) {
+        this.terrainTexture = terrainTexture;
+        fireChangeEvent();
+    }
+    
+    public float getTerrainTextureRepeat() { return terrainTextureRepeat; }
+    public void setTerrainTextureRepeat(float terrainTextureRepeat) {
+        this.terrainTextureRepeat = terrainTextureRepeat;
         fireChangeEvent();
     }
 }

@@ -44,11 +44,17 @@ public class JEditWindow extends JFrame {
     private File getRootDirectory() {
         if (rootDirectory == null) {
             try {
-                // Get the directory containing the application
-                rootDirectory = new File(System.getProperty("user.dir"));
+                // Get the levels directory as the default directory for file operations
+                File projectRoot = new File(System.getProperty("user.dir"));
+                rootDirectory = new File(projectRoot, "src/main/resources/levels");
+                
+                // Create the directory if it doesn't exist
+                if (!rootDirectory.exists()) {
+                    rootDirectory.mkdirs();
+                }
             } catch (Exception e) {
-                // If we can't get the application directory, use the home directory
-                rootDirectory = new File(System.getProperty("user.home"));
+                // If we can't get the levels directory, fall back to the project root
+                rootDirectory = new File(System.getProperty("user.dir"));
             }
         }
         return rootDirectory;
