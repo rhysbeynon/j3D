@@ -121,9 +121,9 @@ public class JLaunchWindow extends JFrame {
         bottomPanel.setBackground(BACKGROUND_COLOR);
         bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
         
-        // Login button (placeholder)
-        JButton loginButton = createSecondaryButton("Login", this::showLoginTodo);
-        bottomPanel.add(loginButton);
+        // Exit button
+        JButton exitButton = createSecondaryButton("Exit", this::exitApplication);
+        bottomPanel.add(exitButton);
         
         // Help button
         JButton helpButton = createSecondaryButton("?", this::openHelp);
@@ -307,13 +307,19 @@ public class JLaunchWindow extends JFrame {
     }
     
     /**
-     * Shows the login TODO placeholder.
+     * Safely exits the j3D application.
      */
-    private void showLoginTodo(ActionEvent e) {
-        JOptionPane.showMessageDialog(this,
-            "Login functionality is not yet implemented.\n\nThis is a placeholder for future authentication features.",
-            "Login - TODO",
-            JOptionPane.INFORMATION_MESSAGE);
+    private void exitApplication(ActionEvent e) {
+        int result = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to exit j3D?",
+            "Exit j3D",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+            
+        if (result == JOptionPane.YES_OPTION) {
+            System.out.println("Exiting j3D Launcher...");
+            System.exit(0);
+        }
     }
     
     /**

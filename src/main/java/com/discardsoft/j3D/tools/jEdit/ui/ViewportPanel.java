@@ -234,21 +234,28 @@ public class ViewportPanel extends JPanel {
         double worldWidth = getWidth() / zoom;
         double worldHeight = getHeight() / zoom;
         
+        // The center of the visible area in world coordinates
+        // This accounts for the pan offset
+        double centerX = -panX;
+        double centerY = -panY;
+        
         return new Rectangle2D.Double(
-            panX - worldWidth/2,
-            panY - worldHeight/2,
+            centerX - worldWidth/2,
+            centerY - worldHeight/2,
             worldWidth,
             worldHeight
         );
     }
     
     private Point2D screenToWorld(Point2D screenPoint) {
+        // Reverse the transformation: screen -> center -> unzoom -> unpan
         double worldX = (screenPoint.getX() - getWidth()/2.0) / zoom - panX;
         double worldY = (screenPoint.getY() - getHeight()/2.0) / zoom - panY;
         return new Point2D.Double(worldX, worldY);
     }
     
     private Point2D worldToScreen(Point2D worldPoint) {
+        // Apply the transformation: world -> pan -> zoom -> center
         double screenX = (worldPoint.getX() + panX) * zoom + getWidth()/2.0;
         double screenY = (worldPoint.getY() + panY) * zoom + getHeight()/2.0;
         return new Point2D.Double(screenX, screenY);
