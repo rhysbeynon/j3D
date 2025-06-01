@@ -354,12 +354,12 @@ public class JLaunchWindow extends JFrame {
         try {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                URI helpUri = new URI("https://www.google.com");
+                URI helpUri = new URI("https://github.com/rhysbeynon");
                 desktop.browse(helpUri);
             } else {
                 // Fallback: show URL in a dialog
                 JOptionPane.showMessageDialog(this,
-                    "Please open this URL in your browser:\nhttps://www.google.com",
+                    "Please open this URL in your browser:\nhttps://github.com/rhysbeynon",
                     "Help",
                     JOptionPane.INFORMATION_MESSAGE);
             }

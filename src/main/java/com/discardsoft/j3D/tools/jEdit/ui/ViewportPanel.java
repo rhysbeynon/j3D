@@ -246,16 +246,19 @@ public class ViewportPanel extends JPanel {
             worldHeight
         );
     }
-    
-    private Point2D screenToWorld(Point2D screenPoint) {
-        // Reverse the transformation: screen -> center -> unzoom -> unpan
+     private Point2D screenToWorld(Point2D screenPoint) {
+        // Reverse the transformation to match paintComponent:
+        // Graphics: translate(center) -> scale(zoom) -> translate(pan)
+        // Reverse: subtract center -> unscale -> subtract pan
         double worldX = (screenPoint.getX() - getWidth()/2.0) / zoom - panX;
         double worldY = (screenPoint.getY() - getHeight()/2.0) / zoom - panY;
         return new Point2D.Double(worldX, worldY);
     }
-    
+
     private Point2D worldToScreen(Point2D worldPoint) {
-        // Apply the transformation: world -> pan -> zoom -> center
+        // Apply the transformation to match paintComponent:
+        // Graphics: translate(center) -> scale(zoom) -> translate(pan)
+        // Forward: add pan -> scale -> add center
         double screenX = (worldPoint.getX() + panX) * zoom + getWidth()/2.0;
         double screenY = (worldPoint.getY() + panY) * zoom + getHeight()/2.0;
         return new Point2D.Double(screenX, screenY);
@@ -358,6 +361,11 @@ public class ViewportPanel extends JPanel {
         float oldZoom = zoom;
         float zoomFactor = 1.1f;
         
+        // Get mouse position relative to panel center
+        double mouseX = e.getX() - getWidth() / 2.0;
+        double mouseY = e.getY() - getHeight() / 2.0;
+        
+        // Apply zoom change
         if (e.getWheelRotation() < 0) {
             zoom *= zoomFactor;
         } else {
@@ -366,12 +374,16 @@ public class ViewportPanel extends JPanel {
         
         zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
         
-        // Zoom towards mouse position
+        // Only adjust pan if zoom actually changed
         if (zoom != oldZoom) {
-            Point2D mouseWorld = screenToWorld(e.getPoint());
-            // Adjust pan to keep mouse position constant
-            panX = (float) (mouseWorld.getX() - (e.getX() - getWidth()/2.0) / zoom);
-            panY = (float) (mouseWorld.getY() - (e.getY() - getHeight()/2.0) / zoom);
+            // Adjust pan to keep the mouse point fixed in world space
+            // The idea: mouse point in world space should remain constant
+            // Before: (mouseX/oldZoom - panX_old) = world point
+            // After:  (mouseX/newZoom - panX_new) = same world point
+            // Therefore: panX_new = panX_old + mouseX * (1/newZoom - 1/oldZoom)
+            panX += (float) (mouseX * (1.0/zoom - 1.0/oldZoom));
+            panY += (float) (mouseY * (1.0/zoom - 1.0/oldZoom));
+            
             repaint();
         }
     }
