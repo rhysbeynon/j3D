@@ -58,7 +58,23 @@ public class LevelLoader {
      * @throws Exception If the level file cannot be loaded or parsed
      */
     public LoadedLevel loadLevel(String levelPath) throws Exception {
-        String jsonContent = Utils.loadResource(levelPath);
+        String jsonContent;
+        
+        // Check if the path is a filesystem path (starts with a drive letter, slash, or relative path)
+        if (levelPath.startsWith("/") || levelPath.contains(":") || levelPath.startsWith("src/")) {
+            // Load from filesystem
+            try {
+                jsonContent = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(levelPath)));
+            } catch (Exception e) {
+                // If filesystem loading fails, try classpath loading as fallback
+                System.out.println("Filesystem loading failed for " + levelPath + ", trying classpath...");
+                jsonContent = Utils.loadResource(levelPath.startsWith("/") ? levelPath : "/" + levelPath);
+            }
+        } else {
+            // Load from classpath resources
+            jsonContent = Utils.loadResource(levelPath.startsWith("/") ? levelPath : "/" + levelPath);
+        }
+        
         JsonObject levelData = gson.fromJson(jsonContent, JsonObject.class);
         
         LoadedLevel level = new LoadedLevel();
@@ -196,11 +212,11 @@ public class LevelLoader {
     
     private TerrainEntity loadTerrain(JsonObject terrainData) throws Exception {
         float size = terrainData.get("size").getAsFloat();
-        int gridCount = terrainData.get("grid_count").getAsInt();
+        int gridCount = terrainData.get("gridCount").getAsInt();
         float height = terrainData.get("height").getAsFloat();
         Vector3f position = jsonObjectToVector(terrainData.getAsJsonObject("position"));
         String texture = terrainData.get("texture").getAsString();
-        float textureRepeat = terrainData.get("texture_repeat").getAsFloat();
+        float textureRepeat = terrainData.get("textureRepeat").getAsFloat();
         
         String texturePath = "src/main/resources/textures/" + texture;
         

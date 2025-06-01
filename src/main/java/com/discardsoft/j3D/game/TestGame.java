@@ -117,8 +117,9 @@ public class TestGame implements IGameLogic {
         // Load the scene from j3dl file instead of creating a hardcoded TestScene
         try {
             LevelLoader levelLoader = new LevelLoader(loader);
-            // Use classpath resource path instead of filesystem path
-            LoadedLevel loadedLevel = levelLoader.loadLevel("/levels/test_level.j3dl");
+            // Load from filesystem where jEDIT saves levels
+            String levelPath = "src/main/resources/levels/test_level.j3dl";
+            LoadedLevel loadedLevel = levelLoader.loadLevel(levelPath);
             
             // Set the loaded scene
             scene = loadedLevel.scene;
@@ -561,8 +562,8 @@ public class TestGame implements IGameLogic {
             // Create LoadedLevel from current scene
             LevelLoader.LoadedLevel currentLevel = createLoadedLevelFromScene();
             
-            // Define save path (you can customize this path as needed)
-            String savePath = "saved_level.json";
+            // Define save path to match jEDIT's location
+            String savePath = "src/main/resources/levels/saved_level.j3dl";
             
             // Save the level
             levelLoader.saveLevel(currentLevel, savePath);
@@ -585,8 +586,8 @@ public class TestGame implements IGameLogic {
             // Create level loader instance
             LevelLoader levelLoader = new LevelLoader(loader);
             
-            // Define load path (should match the save path)
-            String loadPath = "saved_level.json";
+            // Define load path to match jEDIT's location
+            String loadPath = "src/main/resources/levels/saved_level.j3dl";
             
             // Clear current scene first
             scene.clearEntities();
