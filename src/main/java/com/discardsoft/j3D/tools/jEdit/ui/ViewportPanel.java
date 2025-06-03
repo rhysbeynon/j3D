@@ -20,6 +20,23 @@ import java.util.List;
  * - Mouse interaction for selection and movement
  * - Multiple view modes (top, side, front)
  * - Trackpad gesture support (two-finger pan, pinch-to-zoom)
+ * 
+ * Keyboard Controls:
+ * - 1/2/3: Switch between Top/Side/Front views
+ * - G: Toggle grid visibility
+ * - Delete: Delete selected entities
+ * - Minus (-): Zoom out
+ * - Equals/Plus (=/+): Zoom in
+ * - 0: Reset zoom and pan to default
+ * - Escape: Deselect all entities
+ * 
+ * Mouse/Trackpad Controls:
+ * - Left click: Select entities
+ * - Left drag: Move selected entities
+ * - Middle click/Ctrl+Left: Pan view
+ * - Scroll wheel: Zoom (non-macOS) or Pan (macOS)
+ * - Ctrl+Scroll: Zoom on macOS trackpads
+ * - Shift+Scroll: Horizontal pan
  */
 public class ViewportPanel extends JPanel {
     
@@ -536,6 +553,22 @@ public class ViewportPanel extends JPanel {
                 break;
             case KeyEvent.VK_G:
                 toggleGrid();
+                break;
+            case KeyEvent.VK_PLUS:
+            case KeyEvent.VK_EQUALS:
+                zoomIn();
+                break;
+            case KeyEvent.VK_MINUS:
+                zoomOut();
+                break;
+            case KeyEvent.VK_0:
+                resetZoom();
+                break;
+            case KeyEvent.VK_ESCAPE:
+                // Deselect all entities
+                levelModel.clearSelection();
+                hoveredEntity = null;
+                repaint();
                 break;
         }
     }

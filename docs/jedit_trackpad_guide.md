@@ -25,7 +25,10 @@ jEDIT now includes enhanced trackpad support for macOS users, making the level e
 - **1, 2, 3**: Switch between Top, Side, and Front views
 - **G**: Toggle grid visibility
 - **Delete**: Delete selected entities
-- **Ctrl+Z/Y**: Undo/Redo (when implemented)
+- **Minus (-)**: Zoom out
+- **Equals/Plus (=/+)**: Zoom in
+- **0**: Reset zoom and pan to default
+- **Escape**: Deselect all entities
 
 ## Technical Improvements
 
