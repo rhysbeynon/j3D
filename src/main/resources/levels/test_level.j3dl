@@ -4,13 +4,13 @@
     "description": "A test level converted from TestScene with terrain and a rotating Suzanne model",
     "author": "DiscardSoft",
     "version": "1.0",
-    "created": "2025-06-01T14:09:20.111155Z"
+    "created": "2025-06-03T13:36:22.913251Z"
   },
   "entities": [
     {
       "id": "suzanne_001",
       "name": "Suzanne Monkey Head",
-      "model": "P_Cube",
+      "model": "Suzanne",
       "position": {
         "x": -3.9999924,
         "y": 1.0,
@@ -22,14 +22,14 @@
         "z": 0.0
       },
       "scale": {
-        "x": 10.0,
+        "x": 1.0,
         "y": 1.0,
         "z": 1.0
       }
     },
     {
       "id": "entity_1748786884670",
-      "name": "Sphere 2",
+      "name": "Ground1",
       "model": "P_Sphere_Medium",
       "position": {
         "x": -15.234031,
