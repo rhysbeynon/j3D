@@ -1,5 +1,6 @@
 <div align="center">
   <img src="src/main/resources/j3D_LIGHT.png" alt="j3D Engine Logo" width="250">
+  <img src="src/main/resources/j3D_DARK.png" alt="j3D Engine Logo" width="250">
 </div>
 
 ## Overview
