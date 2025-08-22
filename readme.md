@@ -2,6 +2,12 @@
   <img src="src/main/resources/j3D_LIGHT.png" alt="j3D Engine Logo" width="250">
 </div>
 
+## Resources
+
+- [j3D Manual](j3D_manual.md)
+- [j3D Engine Shortcuts](J3D_SHORTCUTS.md)
+- [jEDIT Shortcuts](JEDIT_SHORTCUTS.md)
+
 ## Overview
 
 j3D is a lightweight, Java-based 3D game engine built with LWJGL and OpenGL. 
