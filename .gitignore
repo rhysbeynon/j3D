@@ -40,3 +40,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignore custom levels so local levels aren't accidentally pushed
+# Keep the directory with a .gitkeep file; ignore everything else inside
+/src/main/resources/levels/*
+!/src/main/resources/levels/.gitkeep
